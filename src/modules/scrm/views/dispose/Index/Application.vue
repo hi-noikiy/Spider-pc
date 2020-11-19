@@ -1,0 +1,249 @@
+<template>
+  <!-- 应用 -->
+  <div>
+    <div class="title">配置小数桔调用接口所需要的密钥等信息</div>
+    <div class="from">
+      <el-form :model="formData" ref="ruleForm" label-width="132px" label-position="right" class="demo-ruleForm">
+        <el-form-item
+          label="应用名称"
+          :rules="[{ required: true, message: '请输入应用名称', trigger: 'blur' }]"
+          prop="name"
+        >
+          <el-input v-model="formData.name" placeholder="请输入应用名称" :disabled="isDisabled" clearable></el-input>
+        </el-form-item>
+        <el-form-item
+          label="应用AgentId"
+          :rules="[{ required: true, message: '请输入应用AgentId', trigger: 'blur' }]"
+          prop="agentId"
+        >
+          <div class="item_content">
+            <el-input
+              v-model="formData.agentId"
+              placeholder="请输入应用AgentId"
+              :disabled="isDisabled"
+              clearable
+            ></el-input>
+            <el-popover
+              placement="right"
+              title="获取应用ID以及密钥"
+              width="400"
+              trigger="hover"
+              content="进入https://work.weixin.qq.com/wework_admin/frame#apps应用管理-应用，进入最下方创建好的小树桔应用，复制AgentId、Secret"
+            >
+              <el-button slot="reference" type="text" icon="el-icon-warning-outline"></el-button>
+            </el-popover>
+          </div>
+        </el-form-item>
+        <el-form-item
+          label="应用Secret"
+          :rules="[{ required: true, message: '请输入应用Secret', trigger: 'blur' }]"
+          prop="secret"
+        >
+          <el-input
+            v-model="formData.secret"
+            placeholder="请输入应用Secret"
+            :disabled="isDisabled"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button plain @click="updateButton">修改</el-button>
+          <el-button type="primary" @click="createCompany" v-if="isNewFlag">保存</el-button>
+          <el-button type="primary" @click="updateCompany" v-if="!isNewFlag">保存</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="title">配置小数桔应用</div>
+    <div class="words_content">
+      <p class="second_title">1.配置应用侧边栏</p>
+      <p class="second_content">在已创建的应用基础上选择“配置到聊天工具栏”功能；</p>
+      <p class="second_content">
+        配置页面：页面名称根据需要填写，例如“话术库/客户画像”，页面内容选择自定义，
+      </p>
+      <p class="second_content">页面url根据需要填写：</p>
+      <p class="second_content">
+        话术库：{{ copySpeechcraft }}
+        <el-button type="text" :data-clipboard-text="copySpeechcraft" class="btn">复制</el-button>
+      </p>
+      <p class="second_content">
+        客户画像：{{ copySustomerInfo }}
+        <el-button type="text" :data-clipboard-text="copySustomerInfo" class="btn">复制</el-button>
+      </p>
+      <p class="second_title">2.配置网页授权域名</p>
+      <p class="second_content">
+        设置可信域名为“{{ copyCom }}”
+        <el-button type="text" :data-clipboard-text="copyCom" class="btn">复制</el-button>
+        ，可作为应用OAuth2.0网页授权功能的回调域名
+      </p>
+      <!-- <p class="second_title">3.申请校验域名</p> -->
+    </div>
+  </div>
+</template>
+
+<script>
+import api from '../../../api/dispose'
+import Clipboard from 'clipboard'
+export default {
+  data() {
+    return {
+      // 表单数据
+      formData: {
+        name: '',
+        appId: '',
+        secret: ''
+      },
+      // 是否为修改可编辑状态
+      isDisabled: true,
+      // 是否未新建
+      isNewFlag: true,
+      // 企业号名称
+      id: '',
+      // 企业号id
+      name: '',
+      clipboard: '',
+      copySpeechcraft: 'https://x.wego168.com/xxx/scrm/#/sidebar/speechcraft',
+      copySustomerInfo: 'https://x.wego168.com/xxx/scrm/#/sidebar/customerInfo',
+      copyCom: 'x.wego168.com'
+    }
+  },
+  methods: {
+    // ---页面渲染---
+    // 修改
+    updateButton() {
+      this.isDisabled = false
+    },
+    // ---获取数据---
+    // 获取授权信息
+    disposePage(options) {
+      let id = this.$store.state.dispose.id
+      let name = this.$store.state.dispose.name
+      if (!id || !name) {
+        this.$message.success('请先完成企业配置再进行应用配置')
+        return
+      }
+      this.id = id
+      this.name = name
+      api.disposePage(options).then((res) => {
+        let data = res.data.data.list
+        if (!data || data.length == 0) {
+          this.isDisabled = false
+          this.isNewFlag = true
+          return
+        }
+        data.forEach((item) => {
+          if (item.agentId != -1) {
+            this.formData = item
+            this.isDisabled = true
+            this.isNewFlag = false
+          } else {
+            this.isDisabled = false
+            this.isNewFlag = true
+          }
+        })
+      })
+    },
+    // 新建授权
+    createCompany() {
+      if (this.isDisabled) {
+        return
+      }
+      this.$refs.ruleForm.validate((valid) => {
+        this.formData.cropId = this.id
+        this.formData.customerSecret = -1
+        this.formData.mark = 'contact'
+        this.formData.signatureToken = -1
+        this.formData.signatureKey = -1
+        if (valid) {
+          api.disposeAdd(this.formData).then(() => {
+            this.$message.success('新建成功')
+            this.isDisabled = true
+            this.disposePage()
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    // 修改授权
+    updateCompany() {
+      if (this.isDisabled) {
+        return
+      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          api.disposeUpdate(this.formData).then((res) => {
+            this.disposePage()
+            this.$message.success('修改成功')
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    copy() {
+      var clipboard = new Clipboard('.btn')
+      this.clipboard = clipboard
+      clipboard.on('success', (e) => {
+        this.$message.success('复制成功')
+      })
+      clipboard.on('error', (e) => {
+        this.$message.error('复制失败')
+      })
+    }
+  },
+  created() {
+    this.disposePage()
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.copy()
+    })
+  },
+  destroyed() {
+    this.clipboard.destroy()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.title {
+  font-size: 16px;
+  padding: 20px 0;
+  color: #606266;
+  position: relative;
+  &::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 20px;
+    background-color: #294a7b;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    left: -20px;
+  }
+}
+.from {
+  width: 600px;
+  .item_content {
+    width: 494px;
+    display: flex;
+    .el-button {
+      margin-left: 10px;
+    }
+  }
+}
+.words_content {
+  p {
+    width: 600px;
+    font-size: 14px;
+    color: #606266;
+    min-height: 36px;
+    line-height: 36px;
+    &.second_content {
+      text-indent: 2em;
+    }
+  }
+}
+</style>
