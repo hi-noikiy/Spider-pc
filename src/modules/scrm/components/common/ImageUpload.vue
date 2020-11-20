@@ -23,6 +23,7 @@
         <p class="icon el-icon-plus"></p>
       </div>
     </el-upload>
+    <div class="percent" v-show="isLoading">上传进度：{{percent}}</div>
   </div>
 </template>
 
@@ -51,7 +52,8 @@ export default {
   data() {
     return {
       isLoading: false, // 上传状态
-      action: `${BASEURL}/api/v1/attachments/images/tencent_cloud`
+      action: `${BASEURL}/api/v1/attachments/images/tencent_cloud`,
+      percent: 0
     }
   },
   created() {},
@@ -73,7 +75,8 @@ export default {
     // 上传中
     onProgress(e, file) {
       this.isLoading = true
-      // console.log(e, file)
+      this.percent = e.percent
+      // console.log('eeeeeeeeeeeee',e.percent)
       // e的数据结构为 ProgressEvent {isTrusted: true, percent: 29.292282774199936, lengthComputable: true, loaded: 2375680, total: 8110259, …}
       // percent为上传进度
     },

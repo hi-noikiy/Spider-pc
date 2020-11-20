@@ -84,7 +84,7 @@ export default {
           prop: 'sequence'
         },
         {
-          title: '状态',
+          title: '启用状态',
           align: 'center',
           formatter: (row) => {
             return row.isEnabled === true ? '启用' : '停用'

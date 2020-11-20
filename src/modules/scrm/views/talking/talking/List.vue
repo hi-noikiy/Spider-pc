@@ -824,7 +824,7 @@ export default {
   created() {
     this.isNeedUseTalkingPage()
     this.getSpeechCategory()
-    this.getCategoryOptions()
+    // this.getCategoryOptions()
   },
   mounted() {
     this.$nextTick(() => {
@@ -916,6 +916,17 @@ export default {
           if (!this.currentCategoryID) this.currentCategoryID = list[0].id
           this.getSpeechList(this.currentCategoryID) // 刷新分组数据
         }
+
+        // 设置一级分组选项
+        let newList = []
+        list.forEach(item => {
+          let obj = {
+            label: item.name,
+            value: item.id
+          }
+          newList.push(obj)
+        })
+        this.options.category = newList
       })
     },
     categoryChange(item) {
@@ -923,7 +934,7 @@ export default {
       this.menuTableData = []
       this.tableData = []
       this.getSpeechList(item.id)
-      this.getGroupOptions(item.id)
+      // this.getGroupOptions(item.id)
     },
     // 获取分组下的数据列表
     getSpeechList(parentId) {
@@ -933,7 +944,7 @@ export default {
         .getSpeechcraftGroupList({ parentId })
         .then((res) => {
           this.menuTableLoading = false
-          let list = res.data.data
+          let list = [].concat(res.data.data)
           this.menuTableData = list
           let obj = {
             id: 'add-new',
@@ -944,10 +955,22 @@ export default {
             // 默认选中第一项
             this.currentRow = list[0]
             this.currentGroupID = list[0].id
-            this.getSpeechcraftPage()
+            // this.getSpeechcraftPage()
           } else {
             this.tableLoading = false
           }
+
+          // 设置二级分组选项
+          let newList = []
+          res.data.data.forEach(item => {
+            let obj = {
+              label: item.name,
+              value: item.id
+            }
+            newList.push(obj)
+          })
+          this.options.group = newList
+          console.log('分组数据', newList)
         })
         .catch(() => (this.menuTableLoading = false))
     },

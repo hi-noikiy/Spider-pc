@@ -77,7 +77,11 @@
               <img :src="scope.row.avatar || defaultHearderImage" alt="" width="44" height="44" />
             </template>
           </el-table-column>
-          <el-table-column align="center" prop="remarkList" label="备注名"></el-table-column>
+          <el-table-column align="center" prop="remarkList" label="备注名">
+            <template slot-scope="scope">
+              {{ scope.row.remarkList | remarkListFilters }}
+            </template>
+          </el-table-column>
           <el-table-column align="center" prop="name" label="微信昵称"></el-table-column>
           <el-table-column align="center" prop="lifeCycleNameList" label="生命周期"></el-table-column>
           <el-table-column align="center" prop="userNameList" label="所属成员">
@@ -591,9 +595,23 @@ export default {
     // 获取客户会话开启状态
     getOpenStatus() {
       this.$http.getOpenStatus().then((res) => {
-        this.getOpenStatusBoolean = res.data
+        console.log('会话设置', res.data.data)
+        this.getOpenStatusBoolean = res.data.data
         this.getCustomerPage()
       })
+    }
+  },
+  filters: {
+    remarkListFilters(option) {
+      if (!option) {
+        return ""
+      }
+      let remarksArr = []
+      remarksArr = option.reduce((total, now) => {
+        total.includes(now) ? '' : total.push(now)
+        return total
+      }, [])
+      return remarksArr.join('/')
     }
   }
 }

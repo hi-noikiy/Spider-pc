@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="id ? '添加客户回收规则' : '修改客户回收规则'"
+    :title="id ? '修改客户回收规则' : '添加客户回收规则'"
     :visible.sync="visible"
     width="890px"
     :append-to-body="true"
@@ -46,12 +46,12 @@
             </el-option>
           </el-select>
           <span>阶段</span>
-          <el-input class='blank' type='number' v-model="rulesDay"></el-input>
+          <el-input class='blank' :min="0" type='number' v-model="rulesDay"></el-input>
           <span>天未添加跟进记录，自动回收至公海池</span>
           
           <div style='margin-top:10px'>
             <span>在回收前</span>
-            <el-input class='blank' type='number' v-model="rulesDay"></el-input>
+            <el-input class='blank' :min="0" type='number' v-model="rulesDay"></el-input>
             <span>天提醒员工</span>
             <el-tooltip effect="dark" placement="top">
               <div style='line-height:20px' slot="content">比如进入某阶段，3个自然日未添加记<br/>录自动回收至公海池，在回收前1天提<br/>醒，那么在1号 10:30客户跟进，在5<br/>号00:00自动回收至公海池，4号早上9<br/>点发送即将回收通知给该员工</div>
@@ -73,9 +73,9 @@
         </el-select>
       </el-form-item> -->
       <div class='botbor'>
-        <el-form-item label="非企微客户数量：" prop="groupId" :rules="[{ required: true, message: '该字段不能为空' }]">
+        <el-form-item label="非企微客户数量：" prop="rulesDay" :rules="[{ required: true, message: '该字段不能为空',trigger:  ['blur', 'change']}]">
           <span>每个员工个人所持有的非企微客户上限数量</span>
-          <el-input class='blank' type='number' v-model="rulesDay"></el-input>
+          <el-input class='blank' :min="0" type='number' v-model="rulesDay"></el-input>
           <span>位</span>
           <div>(在【公海池】->【非企微客户】列表，员工录入/批量导入客户数量不计入在其中。)</div>
         </el-form-item>
@@ -88,7 +88,7 @@
         </el-form-item>
         <el-form-item label="员工捡回：" prop="groupId" :rules="[{ required: true, message: '该字段不能为空' }]">
           <span>自回收至公海池</span>
-          <el-input class='blank' type='number' v-model="rulesDay"></el-input>
+          <el-input class='blank' :min="0" type='number' v-model="rulesDay"></el-input>
           <span>天后可重新捡回（在某员工手上丢失的客户，回收至公海池，只可在规定的时间后才可重新认领。如设置7天后可重新捡回，1号回收至公海池，8号00：00该员工才能重新认领。）</span>
         </el-form-item>
       </div>
@@ -179,7 +179,7 @@ export default {
     visible(val) {
       if (val) {
         if (this.id) {
-          
+          console.log(this.id)
         }
       }
     }

@@ -155,6 +155,6 @@ export default {
   },
   // 基础字段-修改默认
   basicFieldSaveDefault(params) {
-    return fetch.post('api/admin/v1/customerExternalProfile/saveDefault', params)
+    return fetch.post('api/admin/v1/customerExternalProfile/checkDefault', params)
   },
 }

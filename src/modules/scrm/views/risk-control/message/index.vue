@@ -1,5 +1,11 @@
 <template>
   <div class="container">
+    <div>
+      <GoBack
+        :title="'聊天详情'"
+        v-if="$route.query.conversationId != undefined && $route.query.userId != undefined"
+      ></GoBack>
+    </div>
     <div class="violation-none" v-if="isOpen == false">
       <div class="none-image">
         <img src="../../../images/none_dispose.png" alt="" />
@@ -15,7 +21,7 @@
           <div class="member-msg-div">
             <div class="member-msg" @click.stop="chooseDispose()">
               <el-image
-                style="width: 44px; height: 44px; border: 1px solid #EBEEF5; border-radius: 4px"
+                style="width: 44px; height: 44px; border: 1px solid #ebeef5; border-radius: 4px"
                 :src="customerNameListFirst.thumbAvatar"
                 fit="cover"
               ></el-image>
@@ -35,6 +41,7 @@
                       class="el-input-search"
                       size="mini"
                       prefix-icon="el-icon-search"
+                      clearable
                     ></el-input>
                   </div>
                   <div class="member-all-div">
@@ -72,6 +79,7 @@
               size="mini"
               prefix-icon="el-icon-search"
               @input="getFristCustomer"
+              clearable
             ></el-input>
           </div>
           <div class="customer-list">
@@ -153,6 +161,7 @@
                   placeholder="搜索消息"
                   v-model="searchMessage.keyword"
                   @input="getNoneMessage"
+                  clearable
                 >
                 </el-input>
               </div>
@@ -215,7 +224,13 @@
             <div class="top-right">
               <div class="search-input">
                 <span>消息内容</span>
-                <el-input size="mini" placeholder="搜索消息" v-model="searchMessage.keyword" @input="getpageMessage">
+                <el-input
+                  size="mini"
+                  placeholder="搜索消息"
+                  v-model="searchMessage.keyword"
+                  @input="getpageMessage"
+                  clearable
+                >
                 </el-input>
               </div>
               <div class="date-picker">
@@ -235,62 +250,63 @@
               </div>
             </div>
           </div>
-          <div class="dialogue-content" id="scroll-top">
-            <div class="dialogue-more">
-              <span @click="getMoreMessage()" v-if="getMessagePageSizeNum.pageSize == conversationList.length"
-                >点击加载更多</span
-              >
-              <span v-if="getMessagePageSizeNum.pageSize != conversationList.length">暂无更多消息</span>
-            </div>
-            <!-- <div class="dialogue-item" v-for="(item, index) in conversationList.list" :key="index"> -->
-            <div class="dialogue-item" v-for="(item, index) in conversationList" :key="index">
-              <div class="dialogut-item-time">{{ item.messageTime | timeSubString }}</div>
-              <div :class="item.sender.id == userId ? 'item-right-box' : 'item-left-box'">
-                <div :class="item.sender.id == userId ? 'right-content' : 'left-content'">
-                  <img v-if="item.sender.id == userId" class="avatar" :src="item.sender.avatar | isHttp" alt="" />
-                  <el-avatar
-                    class="avatar"
-                    v-if="item.sender.id != userId"
-                    :src="item.sender.avatar | isHttp"
-                  ></el-avatar>
-                  <div class="message">
-                    <el-tag
-                      type="primary"
-                      size="mini"
-                      v-if="item.sender.id == userId && item.action == 'recall'"
-                      class="send-message-right"
-                    >
-                      此消息已撤回
-                      <!-- {{
+          <div class="dialogue-content-box">
+            <div class="dialogue-content" id="scroll-top">
+              <div class="dialogue-more">
+                <span @click="getMoreMessage()" v-if="getMessagePageSizeNum.pageSize == conversationList.length"
+                  >点击加载更多</span
+                >
+                <span v-if="getMessagePageSizeNum.pageSize != conversationList.length">暂无更多消息</span>
+              </div>
+              <!-- <div class="dialogue-item" v-for="(item, index) in conversationList.list" :key="index"> -->
+              <div class="dialogue-item" v-for="(item, index) in conversationList" :key="index">
+                <div class="dialogut-item-time">{{ item.messageTime | timeSubString }}</div>
+                <div :class="item.sender.id == userId ? 'item-right-box' : 'item-left-box'">
+                  <div :class="item.sender.id == userId ? 'right-content' : 'left-content'">
+                    <img v-if="item.sender.id == userId" class="avatar" :src="item.sender.avatar | isHttp" alt="" />
+                    <el-avatar
+                      class="avatar"
+                      v-if="item.sender.id != userId"
+                      :src="item.sender.avatar | isHttp"
+                    ></el-avatar>
+                    <div class="message">
+                      <el-tag
+                        type="primary"
+                        size="mini"
+                        v-if="item.sender.id == userId && item.action == 'recall'"
+                        class="send-message-right"
+                      >
+                        此消息已撤回
+                        <!-- {{
                     item.action == 'send' ? '发送消息' : item.action == 'recall' ? '此消息已撤回' : ''
                   }} -->
-                    </el-tag>
+                      </el-tag>
 
-                    <div class="msg-text" v-if="item.messageType != 'emotion' && item.messageType != 'image'">
-                      <p v-html="parsingEmoji(item.content)"></p>
-                    </div>
+                      <div class="msg-text" v-if="item.messageType != 'emotion' && item.messageType != 'image'">
+                        <p v-html="parsingEmoji(item.content)"></p>
+                      </div>
 
-                    <div class="msg-emotions" v-if="item.messageType == 'emotion'">
-                      <el-image
-                        :src="(item.host + item.fileUrl) | isImage"
-                        :preview-src-list="[item.host + item.fileUrl]"
-                      >
-                        <div slot="error" class="image-slot">
-                          <i class="el-icon-picture-outline"></i>
-                        </div>
-                      </el-image>
-                    </div>
-                    <div class="msg-image" v-if="item.messageType == 'image'">
-                      <el-image
-                        :src="(item.host + item.fileUrl) | isImage"
-                        :preview-src-list="[item.host + item.fileUrl]"
-                      >
-                        <div slot="error" class="image-slot">
-                          <i class="el-icon-picture-outline"></i>
-                        </div>
-                      </el-image>
-                    </div>
-                    <!-- <div class="msg-link" v-if="item.messageType == 'link'">
+                      <div class="msg-emotions" v-if="item.messageType == 'emotion'">
+                        <el-image
+                          :src="(item.host + item.fileUrl) | isImage"
+                          :preview-src-list="[item.host + item.fileUrl]"
+                        >
+                          <div slot="error" class="image-slot">
+                            <i class="el-icon-picture-outline"></i>
+                          </div>
+                        </el-image>
+                      </div>
+                      <div class="msg-image" v-if="item.messageType == 'image'">
+                        <el-image
+                          :src="(item.host + item.fileUrl) | isImage"
+                          :preview-src-list="[item.host + item.fileUrl]"
+                        >
+                          <div slot="error" class="image-slot">
+                            <i class="el-icon-picture-outline"></i>
+                          </div>
+                        </el-image>
+                      </div>
+                      <!-- <div class="msg-link" v-if="item.messageType == 'link'">
                     <div class="msg-link-box">
                       <div class="msg-link-top">
                         开通企业微信的好处有哪些？这十大好处将带来可观效益开通企业微信的好处有哪些？这十大好处将带来可观效益
@@ -305,7 +321,7 @@
                       </div>
                     </div>
                   </div> -->
-                    <!-- <div class="msg-app" v-if="item.messageType == 'weapp'">
+                      <!-- <div class="msg-app" v-if="item.messageType == 'weapp'">
                     <div class="msg-app-div">
                       <div class="msg-app-top">
                         <div class="msg-app-serve">服务需知</div>
@@ -315,23 +331,23 @@
                       <div class="msg-app-bottom"><i class="el-icon-share"></i>小程序</div>
                     </div>
                   </div> -->
-                    <el-tag
-                      type="primary"
-                      size="mini"
-                      v-if="item.sender.id != userId && item.action == 'recall'"
-                      class="send-message-tag"
-                    >
-                      此消息已撤回
-                      <!-- {{
+                      <el-tag
+                        type="primary"
+                        size="mini"
+                        v-if="item.sender.id != userId && item.action == 'recall'"
+                        class="send-message-tag"
+                      >
+                        此消息已撤回
+                        <!-- {{
                     item.action == 'send' ? '发送消息' : item.action == 'recall' ? '此消息已撤回' : ''
                   }} -->
-                    </el-tag>
+                      </el-tag>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- <div class="dialogue-item">
+              <!-- <div class="dialogue-item">
             <div class="item-right-box">
               <div class="right-content">
                 <img class="avatar" src="#" alt="" />
@@ -341,6 +357,7 @@
               </div>
             </div>
           </div> -->
+            </div>
           </div>
         </div>
       </div>
@@ -349,7 +366,9 @@
 </template>
 
 <script>
+import GoBack from '../../../components/components/GoBack'
 export default {
+  components: { GoBack },
   data() {
     return {
       menus: [
@@ -835,7 +854,7 @@ export default {
       margin-top: 10px;
       // border-bottom: 1px solid #ebeef5;
       padding-top: 10px;
-      background-color: #EBEEF5;
+      background-color: #ebeef5;
       .menu-item {
         padding: 0 10px 10px 10px;
         width: 33.33%;
@@ -851,7 +870,7 @@ export default {
       }
     }
     .message-total {
-      border-bottom: 1px solid #EBEEF5;
+      border-bottom: 1px solid #ebeef5;
       display: flex;
       line-height: 30px;
       padding: 10px 0;
@@ -935,10 +954,10 @@ export default {
         }
       }
       .list-item:hover {
-        background-color: #F5F7FA;
+        background-color: #f5f7fa;
       }
       .active {
-        background-color: #F5F7FA;
+        background-color: #f5f7fa;
       }
     }
   }
@@ -999,12 +1018,17 @@ export default {
         }
       }
     }
+    .dialogue-content-box {
+      height: calc(100% - 87px);
+      padding: 0 20px;
+      background-color: #fff;
+    }
     .dialogue-content {
-      height: calc(100% - 67px);
+      height: 100%;
       padding: 10px;
       box-sizing: border-box;
       overflow-y: auto;
-      background-color: #F5F5F5;
+      background-color: #f5f5f5;
       .none-content {
         user-select: none;
         text-align: center;
@@ -1431,7 +1455,7 @@ export default {
   }
 }
 .member-all-msg:hover {
-  background-color: #F5F7FA;
+  background-color: #f5f7fa;
 }
 .member-all-div {
   margin-top: 50px;

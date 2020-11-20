@@ -53,11 +53,21 @@
           <el-table-column prop="userAvatar" label="头像" align="center">
             <template slot-scope="scope">
               <div>
-                <el-image style="width: 44px; height: 44px" :src="scope.row.userAvatar || defaultHearderImage" fit="fill"></el-image>
+                <el-image
+                  style="width: 44px; height: 44px"
+                  :src="scope.row.userAvatar || defaultHearderImage"
+                  fit="fill"
+                ></el-image>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="userName" label="姓名" align="center"> </el-table-column>
+          <el-table-column prop="userName" label="姓名" align="center">
+            <template slot-scope="scope">
+              <div>
+                {{ scope.row.type == 1 ? scope.row.userName : '非企微客户' }}
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column prop="type" label="身份" align="center">
             <template slot-scope="scope">
               <div>
@@ -256,11 +266,11 @@ export default {
     padding-bottom: 20px;
     position: relative;
     &::before {
-      content: "";
+      content: '';
       display: block;
       width: 8px;
       height: 20px;
-      background-color: #294A7B;
+      background-color: #294a7b;
       position: absolute;
       left: -20px;
       top: -2px;

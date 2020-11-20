@@ -186,7 +186,7 @@ export default {
     },
     //页面滚动到底部的方法
     getScrollY() {
-      this.$nextTick(function () {
+      this.$nextTick(function() {
         setTimeout(() => {
           let middle = document.getElementById('scroll-top')
           if (middle) {
@@ -262,12 +262,12 @@ export default {
         conversationId: this.conversationId,
         sequence: this.sequence
       }
-      this.$http.getSequence(params).then((res) => {
+      this.$http.getSequence(params).then(res => {
         let arr = this.sensitiveWordArray.split(',')
-        res.data.data.list.forEach((item) => {
+        res.data.data.list.forEach(item => {
           let msg = arr
           let str = ''
-          msg.forEach((item) => {
+          msg.forEach(item => {
             str = str + item + '|'
           })
           str.substring(0, str.length - 1)
@@ -373,7 +373,7 @@ export default {
   height: calc(100% - 100px);
   box-sizing: border-box;
   overflow-y: auto;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   .none-content {
     user-select: none;
     text-align: center;
@@ -381,6 +381,7 @@ export default {
     color: #606266;
   }
   .dialogue-more {
+    padding-top: 10px;
     text-align: center;
     span {
       color: #409eff;
@@ -729,12 +730,12 @@ export default {
 .cont-top {
   padding: 20px 0;
   .customer-info {
-    font-size:14px;
+    font-size: 14px;
     color: #000000;
     font-weight: bold;
   }
   .info-tips {
-    font-size:12px;
+    font-size: 12px;
     color: #909399;
     margin-top: 10px;
   }

@@ -58,7 +58,9 @@
           </el-form-item>
           <div class="image-div" v-if="model.type === 'image'">
             <el-form-item>
-              <UploadImage :fileList="imageUrlFileList" @success="UploadImageSuccess"></UploadImage>
+              <QcImageUpload width="100px" height="100px" class="image-upload" v-model="imageUrl" prop="imageUrl">
+              </QcImageUpload>
+              <span class="picture_tips">(上传图片)</span>
             </el-form-item>
           </div>
           <div class="web-div" v-if="model.type === 'image_text'">
@@ -72,13 +74,37 @@
               ><el-input placeholder="请输入链接地址" v-model="model.link"></el-input
             ></el-form-item>
             <el-form-item>
-              <UploadImage :fileList="linkImageUrlFileList" @success="UploadLinkmageSuccess"></UploadImage>
+              <QcImageUpload width="100px" height="100px" v-model="linkImageUrl"></QcImageUpload>
+              <span class="picture_tips">(上传图片)</span>
             </el-form-item>
           </div>
           <div class="app-div" v-if="model.type === 'program'">
-            <SelectProgramItem ref="SelectProgramItem" :programProps="programIdProps"></SelectProgramItem>
+            <el-form-item label="配置小程序">
+              <el-select placeholder="请选择" v-model="model.programId" @change="getProgramInfo()">
+                <el-option
+                  class="app-select"
+                  v-for="(item, index) in options"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="" v-if="model.programId">
+              <div class="programInfo">
+                <el-card shadow="hover" :body-style="{ padding: '10px' }">
+                  <div class="programInfoContent">
+                    <div class="logo">
+                      <el-avatar size="medium" :src="imgHost + programInfoOption.logo"></el-avatar>
+                    </div>
+                    <div class="name">{{ programInfoOption.name }}</div>
+                  </div>
+                </el-card>
+              </div>
+            </el-form-item>
           </div>
-          <el-form-item label="是否启用" prop="isEnabled" :required="true">
+          <el-form-item label="是否启用" prop="isEnabled"  :required="true">
             <el-switch v-model="model.isEnabled"> </el-switch>
           </el-form-item>
           <el-form-item>
@@ -89,6 +115,26 @@
         </el-form>
       </div>
     </div>
+    <!-- 添加发送对象 -->
+    <!-- <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      :close-on-click-modal="false"
+      :modal-append-to-body="false"
+      :show-close="false"
+      width="800"
+      top="10vh"
+    >
+      <div class="dialogVisibleTree">
+        <div class="department-tree">
+          <department-tree ref="department" :selectedList="memberList"> </department-tree>
+        </div>
+        <div class="footer_btn">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="setMembers">保存</el-button>
+        </div>
+      </div>
+    </el-dialog> -->
     <MemberTreeDialog
       :config="dialogVisible"
       @closeDialog="dialogVisible.visible = false"
@@ -105,8 +151,6 @@ import Emotion from '../../../components/common/Emotion'
 // import DepartmentTree from '../../../components/common/DepartmentTree'
 import MemberTreeDialog from '../../../components/components/MemberTreeDialog'
 import Clipboard from 'clipboard'
-import UploadImage from '../../../components/components/UploadImage'
-import SelectProgramItem from '../../../components/components/SelectProgramItem'
 export default {
   data() {
     return {
@@ -140,16 +184,9 @@ export default {
       changeTag: 'text',
       // 小程序选择列表
       options: [],
-      programIdProps: {
-        id: '',
-        name: '',
-        logo: ''
-      },
       // 上传图片
       imageUrl: '',
-      imageUrlFileList: [],
       linkImageUrl: '',
-      linkImageUrlFileList: [],
       dialogVisible: {
         width: '800px',
         title: '选择目标成员',
@@ -186,25 +223,14 @@ export default {
     changeImage(val) {
       this.model.type = val
     },
-    UploadImageSuccess(val) {
-      console.log(val)
-      this.imageUrl = val.length == 0 ? '' : val[0].url
-    },
     //改变网址
     changeWeb(val) {
       this.model.type = val
-    },
-    UploadLinkmageSuccess(val) {
-      this.linkImageUrl = val.length == 0 ? '' : val[0].url
     },
     //改变小程序
     changeApp(val) {
       this.model.type = val
     },
-    // getSelectProgramItem() {
-    //   let program = this.$refs.SelectProgramItem.success()
-    //   console.log(program);
-    // },
     // 插入表情包
     _selectedEmotion(val) {
       let message = document.getElementById('textInput')
@@ -281,20 +307,14 @@ export default {
           }
           // 提交小程序
           if (this.changeTag == 'program') {
-            let program = this.$refs.SelectProgramItem.success()
-            console.log(program)
-            options.programId = program.id
-            options.link = program.page
-            options.name = program.name
-            options.imageUrl = program.logo
-            // this.options.forEach((item) => {
-            //   if (item.id == this.model.programId) {
-            //     options.programId = item.id
-            //     options.link = item.page
-            //     options.name = item.name
-            //     options.imageUrl = item.logo
-            //   }
-            // })
+            this.options.forEach((item) => {
+              if (item.id == this.model.programId) {
+                options.programId = item.id
+                options.link = item.page
+                options.name = item.name
+                options.imageUrl = item.logo
+              }
+            })
           }
           // 存在id时进行修改操作
           if (this.pageId) {
@@ -339,14 +359,14 @@ export default {
       this.dialogVisible.visible = false
     },
     // 获取小程序信息
-    // getProgramInfo() {
-    //   console.log(this.model.programId)
-    //   this.options.forEach((item) => {
-    //     if (item.id == this.model.programId) {
-    //       this.programInfoOption = item
-    //     }
-    //   })
-    // },
+    getProgramInfo() {
+      console.log(this.model.programId)
+      this.options.forEach((item) => {
+        if (item.id == this.model.programId) {
+          this.programInfoOption = item
+        }
+      })
+    },
     // ---添加发送对象对话框方法end ---
     // ---获取数据函数---
     // 新建欢迎语
@@ -366,12 +386,12 @@ export default {
       })
     },
     // 获取小程序列表
-    // getProgarm() {
-    //   this.$http.getProgarm().then((res) => {
-    //     this.options = res.data.data
-    //     console.log('这是小程序', res.data.data)
-    //   })
-    // },
+    getProgarm() {
+      this.$http.getProgarm().then((res) => {
+        this.options = res.data.data
+        console.log('这是小程序', res.data.data)
+      })
+    },
     // 获取欢迎语详情
     getUserWelcome(id) {
       this.$http.getUserWelcome({ id }).then((res) => {
@@ -381,30 +401,9 @@ export default {
         this.appId = res.data.data.appId
         if (this.changeTag == 'image') {
           this.imageUrl = res.data.data.imageUrl
-          this.imageUrlFileList = [
-            {
-              name: 'image',
-              url: this.imgHost + this.imageUrl
-            }
-          ]
-          console.log(this.imageUrl)
         }
         if (this.changeTag == 'image_text') {
           this.linkImageUrl = res.data.data.imageUrl
-          this.linkImageUrlFileList = [
-            {
-              name: 'image',
-              url: this.imgHost + this.linkImageUrl
-            }
-          ]
-        }
-        if (this.changeTag == 'program') {
-          this.programIdProps = {
-            id : res.data.data.programId,
-            name : res.data.data.name,
-            logo : res.data.data.imageUrl,
-          } 
-          console.log(this.changeTag,this.programIdProps);
         }
         res.data.data.welcomeUserList.forEach((item) => {
           this.idList.push({ userId: item.userId, type: 0 })
@@ -417,14 +416,12 @@ export default {
   components: {
     Emotion,
     MemberTreeDialog,
-    UploadImage,
-    SelectProgramItem
   },
   created() {
     //  获取页面id
     this.getPageId()
     // 获取小程序
-    // this.getProgarm()
+    this.getProgarm()
     // 获取企业成员树
     // this.getMembers()
   }

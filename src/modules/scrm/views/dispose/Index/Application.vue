@@ -3,7 +3,7 @@
   <div>
     <div class="title">配置小数桔调用接口所需要的密钥等信息</div>
     <div class="from">
-      <el-form :model="formData" ref="ruleForm" label-width="132px" label-position="right" class="demo-ruleForm">
+      <el-form :model="formData" ref="ruleForm" label-width="135px" label-position="right" class="demo-ruleForm">
         <el-form-item
           label="应用名称"
           :rules="[{ required: true, message: '请输入应用名称', trigger: 'blur' }]"
@@ -47,9 +47,9 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button plain @click="updateButton">修改</el-button>
-          <el-button type="primary" @click="createCompany" v-if="isNewFlag">保存</el-button>
-          <el-button type="primary" @click="updateCompany" v-if="!isNewFlag">保存</el-button>
+          <el-button plain @click="updateButton" v-show="isDisabled">修改</el-button>
+          <el-button type="primary" @click="createCompany" v-if="isNewFlag && !isDisabled">保存</el-button>
+          <el-button type="primary" @click="updateCompany" v-if="!isNewFlag && !isDisabled">保存</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -57,9 +57,7 @@
     <div class="words_content">
       <p class="second_title">1.配置应用侧边栏</p>
       <p class="second_content">在已创建的应用基础上选择“配置到聊天工具栏”功能；</p>
-      <p class="second_content">
-        配置页面：页面名称根据需要填写，例如“话术库/客户画像”，页面内容选择自定义，
-      </p>
+      <p class="second_content">配置页面：页面名称根据需要填写，例如“话术库/客户画像”，页面内容选择自定义，</p>
       <p class="second_content">页面url根据需要填写：</p>
       <p class="second_content">
         话术库：{{ copySpeechcraft }}
@@ -75,15 +73,34 @@
         <el-button type="text" :data-clipboard-text="copyCom" class="btn">复制</el-button>
         ，可作为应用OAuth2.0网页授权功能的回调域名
       </p>
-      <!-- <p class="second_title">3.申请校验域名</p> -->
+      <p class="second_title">3.申请校验域名</p>
+      <el-form label-width="135px" label-position="right">
+        <el-form-item label="上传应用验证文件" :required="true">
+          <UploadFile
+            :api="'api/admin/v1.2/upload-file'"
+            :accept="'text/plain'"
+            :size="5"
+            @success="UploadFileSuccess"
+          ></UploadFile>
+        </el-form-item>
+        <el-form-item label="文件" :required="true" v-if="fileName">
+          <a
+            :href="`https://x.wego168.com/${fileName}`"
+            target="_blank"
+            >{{ fileName }}</a>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
-
 <script>
 import api from '../../../api/dispose'
 import Clipboard from 'clipboard'
+import UploadFile from '../../../components/components/UploadFile'
 export default {
+  components: {
+    UploadFile
+  },
   data() {
     return {
       // 表单数据
@@ -103,7 +120,8 @@ export default {
       clipboard: '',
       copySpeechcraft: 'https://x.wego168.com/xxx/scrm/#/sidebar/speechcraft',
       copySustomerInfo: 'https://x.wego168.com/xxx/scrm/#/sidebar/customerInfo',
-      copyCom: 'x.wego168.com'
+      copyCom: 'x.wego168.com',
+      fileName: ''
     }
   },
   methods: {
@@ -111,6 +129,11 @@ export default {
     // 修改
     updateButton() {
       this.isDisabled = false
+    },
+    UploadFileSuccess(val) {
+      console.log(val)
+      this.$message.success('上传成功')
+      this.fileName = val.name
     },
     // ---获取数据---
     // 获取授权信息

@@ -138,11 +138,11 @@
             <!-- <el-table-column type="index" label="序号" align="center"> </el-table-column> -->
             <el-table-column label="群发标题" prop="name" align="center"> </el-table-column>
             <!-- <el-table-column label="群发类型" prop="chatTypeName" align="center"> </el-table-column> -->
-            <el-table-column label="发送时间" align="center">
+            <!-- <el-table-column label="发送时间" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.sendTime | timeSubString }}</span>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column label="创建时间" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.createTime | timeSubString }}</span>

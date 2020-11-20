@@ -26,7 +26,12 @@
           <div class="query-table-box" v-if="nowIndex == 0">
             <el-form inline :model="searchForm" label-width="100px" label-position="right" size="small">
               <el-form-item label="群发标题">
-                <el-input placeholder="请输入群发标题" v-model="searchForm.name" @input="searchLiveCodeList"></el-input>
+                <el-input
+                  placeholder="请输入群发标题"
+                  v-model="searchForm.name"
+                  @input="searchLiveCodeList"
+                  clearable
+                ></el-input>
               </el-form-item>
               <el-form-item label="发送完成时间">
                 <el-date-picker
@@ -54,6 +59,7 @@
                   placeholder="请输入群发标题"
                   v-model="searchDraftForm.name"
                   @input="searchLiveCodeListDraft"
+                  clearable
                 ></el-input>
               </el-form-item>
               <el-form-item>
@@ -130,11 +136,11 @@
             <el-table-column label="群发标题" prop="name" align="center"> </el-table-column>
             <!-- <el-table-column label="群发类型" prop="chatTypeName" align="center"> </el-table-column> -->
 
-            <el-table-column label="发送时间" align="center">
+            <!-- <el-table-column label="发送时间" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.sendTime | timeSubString }}</span>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column label="创建时间" align="center">
               <template slot-scope="scope">
                 <span>{{ scope.row.createTime | timeSubString }}</span>

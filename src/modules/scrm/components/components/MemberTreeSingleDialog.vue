@@ -60,12 +60,12 @@
             </el-input>
           </div>
           <div class="add_member">
-            <el-button type="text" @click="configureWhatToAdd.visible = true">如何添加新成员?</el-button>
+            <el-button size="small" plain :disabled='isLoading' @click="dataSync">同步</el-button>
           </div>
         </div>
         <div class="title_right">已选择的成员({{ selectedMenu.length }})</div>
       </div>
-      <div class="tree_menu">
+      <div class="tree_menu" v-loading="isLoading">
         <!-- 组织架构 -->
         <div class="menu_left">
           <div class="left_tree">
@@ -98,6 +98,7 @@
         </div>
       </div>
       <div class="footer_btns">
+        <el-button type="text" @click="configureWhatToAdd.visible = true" style="margin-right: auto">如何添加新成员?</el-button>
         <el-button @click="closeDialog" plain>取 消</el-button>
         <el-button type="primary" @click="handleConfirm">确 定</el-button>
       </div>
@@ -147,7 +148,8 @@ export default {
       configureWhatToAdd: { // 如何添加新成员
         title: '如何添加新成员',
         visible: false
-      }
+      },
+      isLoading: false
     }
   },
   created() {
@@ -175,7 +177,7 @@ export default {
       this.$emit('handleConfirm', this.selectedMenu)
     },
     // 获取企业组织结构树
-    getDepartmentTree() {
+    getDepartmentTree(callback) {
       this.$http.getDepartmentTree().then((res) => {
         let tree = res.data.data
         tree.forEach((item) => {
@@ -183,14 +185,21 @@ export default {
           //   item.childs.unshift({ id: 1, name: '成员', userList: item.userList })
           // }
           if (item.userList) {
-            item.userList.forEach((name) => {
-              item.childs.unshift(name)
-            })
+            for (let i = item.userList.length - 1; i >= 0; i--) {
+              let obj = item.userList[i]
+              item.childs.unshift(obj)
+            }
+            // item.userList.forEach((name) => {
+            //   item.childs.unshift(name)
+            // })
           }
         })
         this.treeMenu = JSON.parse(JSON.stringify(tree).replace(/"userList"/g, '"childs"'))
         // 设置企业的唯一id
         this.setMyId(this.treeMenu, 0)
+        if (callback) {
+          callback(res)
+        }
       })
     },
     // 设置唯一id
@@ -307,6 +316,22 @@ export default {
     successWhatToAdd() {
       this.configureWhatToAdd.visible = false
     },
+    // 同步数据
+    dataSync() {
+      this.isLoading = true
+      this.$http.syncCustomerList().then(() => {
+        this.treeList = []
+        this.selectedMenu = []
+        this.currentSelected = []
+        this.filterText = ''
+        this.getDepartmentTree((res) => {
+          this.$nextTick(() => {
+            this.setCheckedNodes()
+          })
+          this.isLoading = false
+        })
+      })
+    }
   }
 }
 </script>

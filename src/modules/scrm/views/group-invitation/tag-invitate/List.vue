@@ -19,13 +19,13 @@
         :header-cell-style="{ 'text-align': 'center' }"
       >
         <el-table-column label="任务名称" align="center" prop="name"></el-table-column>
-        <el-table-column label="群名称" align="center"></el-table-column>
-        <el-table-column label="发送邀请成员" align="center"></el-table-column>
-        <el-table-column label="创建时间" align="center"></el-table-column>
-        <el-table-column label="已邀请客户" align="center"></el-table-column>
-        <el-table-column label="已入群客户" align="center"></el-table-column>
-        <el-table-column label="未发送成员" align="center"></el-table-column>
-        <el-table-column label="未邀请客户" align="center"></el-table-column>
+        <!-- <el-table-column label="群名称" align="center"></el-table-column> -->
+        <!-- <el-table-column label="发送邀请成员" align="center"></el-table-column> -->
+        <el-table-column label="创建时间" align="center" prop="createTime"></el-table-column>
+        <!-- <el-table-column label="已邀请客户" align="center"></el-table-column> -->
+        <!-- <el-table-column label="已入群客户" align="center"></el-table-column> -->
+        <!-- <el-table-column label="未发送成员" align="center"></el-table-column> -->
+        <!-- <el-table-column label="未邀请客户" align="center"></el-table-column> -->
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button type="text" @click="getGroupDetail(scope.row.id)">详情</el-button>
@@ -34,7 +34,7 @@
       </el-table>
     </div>
     <div class="common-pagination">
-      <com-pagination :page="page"></com-pagination>
+      <com-pagination :page="page" @sizeChange="onSizeChange" @pageChange="onPageChange"></com-pagination>
     </div>
   </div>
 </template>
@@ -104,6 +104,15 @@ export default {
     addTagInvitation() {
       this.$router.push(`/main/scrm/group-invitation/tag/form`)
     },
+    onSizeChange(val) {
+      this.page.pageSize = val
+      this.page.pageNum = 1
+      this.getGroupInvitationPage()
+    },
+    onPageChange(val) {
+      this.page.pageNum = val
+      this.getGroupInvitationPage()
+    }
   }
 }
 </script>

@@ -70,9 +70,9 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button plain @click="updateButton">修改</el-button>
-          <el-button type="primary" @click="createCompany" v-if="isNewFlag">保存</el-button>
-          <el-button type="primary" @click="updateCompany" v-if="!isNewFlag">保存</el-button>
+          <el-button plain @click="updateButton" v-show="isDisabled">修改</el-button>
+          <el-button type="primary" @click="createCompany" v-if="isNewFlag && !isDisabled">保存</el-button>
+          <el-button type="primary" @click="updateCompany" v-if="!isNewFlag && !isDisabled">保存</el-button>
         </el-form-item>
       </el-form>
     </div>

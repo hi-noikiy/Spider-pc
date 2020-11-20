@@ -103,12 +103,12 @@ export default {
           minWidth: '60px',
           prop: 'mobile'
         },
-        {
-          label: '邮箱',
-          align: 'center',
-          minWidth: '80px',
-          prop: 'email'
-        },
+        // {
+        //   label: '邮箱',
+        //   align: 'center',
+        //   minWidth: '80px',
+        //   prop: 'email'
+        // },
         // {
         //   label: '添加时间',
         //   align: 'center',
@@ -118,7 +118,7 @@ export default {
         {
           label: '操作',
           align: 'center',
-          width: '100px',
+          width: '150px',
           fixed: 'right',
           formatter: row => {
             return (

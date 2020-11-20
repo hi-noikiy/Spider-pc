@@ -67,6 +67,7 @@
                 placeholder="请输入客户名称"
                 v-model="getMessageList.conversationName"
                 @input="getSessionSensitive"
+                clearable
               ></el-input>
             </div>
             <div class="violation-search-right">
@@ -198,6 +199,7 @@
                       v-model="searchAdmin.name"
                       @input="getChooseUser"
                       class="input-class"
+                      clearable
                     ></el-input>
                   </div>
                 </div>
@@ -360,7 +362,7 @@ export default {
     // },
     //页面滚动到底部的方法
     getScrollY() {
-      this.$nextTick(function () {
+      this.$nextTick(function() {
         setTimeout(() => {
           let middle = document.getElementById('disbox')
           if (middle) {
@@ -405,7 +407,7 @@ export default {
       }
       if (this.userId == '') {
         let list = []
-        this.adminList.forEach((item) => {
+        this.adminList.forEach(item => {
           list.push(item.userId)
         })
         this.userId = list.join(',')
@@ -437,7 +439,7 @@ export default {
           pageSize: 999,
           pageNum: 1
         }
-        this.$http.getPermitUserPage(params).then((res) => {
+        this.$http.getPermitUserPage(params).then(res => {
           this.chooseAdminList = res.data.data.list
           let msg = []
           msg = this.userId.split(',')
@@ -549,7 +551,7 @@ export default {
         pageSize: 999,
         pageNum: 1
       }
-      this.$http.getPermitUserPage(params).then((res) => {
+      this.$http.getPermitUserPage(params).then(res => {
         this.chooseAdminList = res.data.data.list
         let msg = this.userId.split(',')
         for (var i = 0; i < this.chooseAdminList.length; i++) {
@@ -572,7 +574,7 @@ export default {
       }
       this.adminList = []
       // let chooseList = []
-      this.userPageList.forEach((item) => {
+      this.userPageList.forEach(item => {
         for (var i = 0; i < this.reChooseList.length + 1; i++) {
           if (this.reChooseList[i] == item.userId) {
             this.adminList.push(item)
@@ -593,7 +595,7 @@ export default {
       // let msg = []
       // // this.reChooseList.concat(this.userId.slice(','))
       adminItem.ischoose = !adminItem.ischoose
-      this.adminPageList.forEach((item) => {
+      this.adminPageList.forEach(item => {
         if (item.ischoose == true) {
           this.reChooseList.push(item.userId)
         }
@@ -634,11 +636,11 @@ export default {
         endTime: endTime,
         conversationName: this.getMessageList.conversationName
       }
-      this.$http.getSessionSensitive(params).then((res) => {
-        res.data.data.list.forEach((item) => {
+      this.$http.getSessionSensitive(params).then(res => {
+        res.data.data.list.forEach(item => {
           let msg = item.sensitiveWordArray
           let str = ''
-          msg.forEach((item) => {
+          msg.forEach(item => {
             str = str + item + '|'
           })
           str.substring(0, str.length - 1)
@@ -675,7 +677,7 @@ export default {
         pageSize: 999,
         pageNum: 1
       }
-      this.$http.getPermitUserPage(params).then((res) => {
+      this.$http.getPermitUserPage(params).then(res => {
         this.userPageList = res.data.data.list
         this.searchUserName.total = res.data.data.total
       })
@@ -694,14 +696,14 @@ export default {
       let params = {
         type: 'crop-conversation'
       }
-      this.$http.getSensitiveWord(params).then((res) => {
+      this.$http.getSensitiveWord(params).then(res => {
         this.wordList = res.data.data.list
         // this.redMessage = res.data.data.list.sensitiveWordArray
       })
     },
     //获取是否开通了
     getOpenStatus() {
-      this.$http.getOpenStatus().then((res) => {
+      this.$http.getOpenStatus().then(res => {
         this.isOpen = res.data.data
         if (this.isOpen == true) {
           this.getMessageConfig()
@@ -716,7 +718,7 @@ export default {
       this.userId = ''
       this.chooseAdminList = []
       this.adminList = []
-      this.$http.getMessageConfig().then((res) => {
+      this.$http.getMessageConfig().then(res => {
         this.getConfig = res.data.data
         this.userId = this.getConfig.userId
 
@@ -732,7 +734,7 @@ export default {
         pageSize: 999,
         pageNum: 1
       }
-      this.$http.getPermitUserPage(params).then((res) => {
+      this.$http.getPermitUserPage(params).then(res => {
         this.chooseAdminList = res.data.data.list
         let msg = []
         if (this.reChooseList.length == 0) {
@@ -772,7 +774,7 @@ export default {
   },
   created() {
     this.getOpenStatus()
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       let className = e.target.className
       if (
         className == 'violation-item-top' ||
@@ -866,7 +868,7 @@ export default {
           margin-top: 13px;
           width: 200px;
           height: 40px;
-          background-color: #EAEDF2;
+          background-color: #eaedf2;
           // border: 1px solid red;
           margin-left: 10px;
           display: flex;
@@ -946,7 +948,7 @@ export default {
               padding: 10px;
               // border: 1px solid red;
               &:hover {
-                background-color: #F5F7FA;
+                background-color: #f5f7fa;
               }
               img {
                 width: 40px;
@@ -1032,14 +1034,14 @@ export default {
           user-select: none;
           border-radius: 5px;
           margin: 0 5px;
-          background-color: #EAEDF2;
+          background-color: #eaedf2;
           color: #606266;
           padding: 5px 10px;
           height: 28px;
           line-height: 28px;
           box-sizing: border-box;
           &.wordIndexFlag {
-            background-color: #294A7B;
+            background-color: #294a7b;
             color: #fff;
           }
         }
@@ -1051,7 +1053,7 @@ export default {
           cursor: pointer;
           user-select: none;
           border-radius: 5px;
-          background-color: #EAEDF2;
+          background-color: #eaedf2;
           color: #606266;
           padding: 5px 10px;
           margin-right: 8px;
@@ -1060,7 +1062,7 @@ export default {
             margin-left: 2px;
           }
           &.wordIndexFlag {
-            background-color: #294A7B;
+            background-color: #294a7b;
             color: #fff;
           }
         }
@@ -1078,7 +1080,7 @@ export default {
           background-color: #fff;
           .violation-item-top {
             display: flex;
-            border-bottom: 1px solid #F5F5F5;
+            border-bottom: 1px solid #f5f5f5;
             padding: 10px;
             justify-content: flex-start;
             .item-top-img {
@@ -1124,7 +1126,7 @@ export default {
             .item-button {
               margin-left: auto;
               .el-button {
-                color: #294A7B;
+                color: #294a7b;
               }
             }
           }
@@ -1307,7 +1309,7 @@ export default {
   }
 }
 .name-class {
-  color: #294A7B;
+  color: #294a7b;
   font-weight: bold;
 }
 .el-form-filter {
@@ -1350,7 +1352,7 @@ export default {
   .addtag-addBtn {
     margin-bottom: 20px;
     .el-button {
-      color: #294A7B;
+      color: #294a7b;
     }
   }
 }

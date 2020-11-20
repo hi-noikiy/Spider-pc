@@ -123,7 +123,7 @@ export default {
   },
   //扩展新增字段-修改默认
   updateSaveDefault(params) {
-    return fetch.post('api/admin/v1/customerExternalProfile/saveDefault', params)
+    return fetch.post('api/admin/v1/customerExternalProfile/checkDefault', params)
   },
   //扩展新增字段-基础字段
   getlistDefault(params) {

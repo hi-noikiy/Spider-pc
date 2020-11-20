@@ -580,6 +580,7 @@ export default {
         } else if (flag == true) {
           this.$message.warning('标签名字不能重复')
         } else {
+          console.log(this.enterpriseModel);
           this.$http.addEnterpriseGroup(this.enterpriseModel).then(() => {
             this.$message.success('添加成功')
             this.addEnterpriseTagDialog.config.visible = false
@@ -678,7 +679,7 @@ export default {
           })
           this.enterpriseEditModel.tagList = newTagList
           console.log(this.enterpriseEditModel)
-          this.$http.updateEnterpriseGroup(this.enterpriseEditModel).then(() => {
+          this.$http.updateEnterpriseGroup(this.enterpriseEditModel).then((res) => {
             this.$message.success('编辑成功')
             this.getEnterpriseTagPage({})
             this.editEnterpriseDialog.config.visible = false

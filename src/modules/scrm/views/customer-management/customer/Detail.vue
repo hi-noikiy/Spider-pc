@@ -50,7 +50,7 @@
           </div>
           <div class="info-item">类型：&nbsp;&nbsp;{{ customerData.typeName }}</div>
           <div class="info-item">状态：&nbsp;&nbsp;{{ customerData.statusName }}</div> -->
-          <!-- <div class="info-item">
+      <!-- <div class="info-item">
             客户分组：&nbsp;&nbsp;<span
               v-for="(item, index) in customerData.groupName"
               :key="index"
@@ -58,12 +58,12 @@
               >{{ item + '、' || '--' }}</span
             >&nbsp;&nbsp;
           </div> -->
-          <!-- <div class="info-item">描述：&nbsp;&nbsp;{{ customerData.description || '--' }}</div>
+      <!-- <div class="info-item">描述：&nbsp;&nbsp;{{ customerData.description || '--' }}</div>
           <div class="info-item">所属成员：&nbsp;&nbsp;{{ customerData.cropUserList | cropUserListFilter }}</div>
           <div class="info-item">更新时间：&nbsp;&nbsp;{{ customerData.updateTime }}</div>
           <div class="info-item">添加时间：&nbsp;&nbsp;{{ customerData.createAtToTime }}</div>
         </div> -->
-        <!-- <div class="eidt-btn">
+      <!-- <div class="eidt-btn">
           <el-button @click="editBtn()" size="small">编辑信息</el-button>
         </div> -->
       <!-- </div> -->
@@ -207,7 +207,7 @@
               </template>
             </el-table-column>
             <el-table-column label="添加时间" align="center" prop="createTime"></el-table-column>
-            <el-table-column label="添加人" align="center" prop="createBy"></el-table-column>
+            <!-- <el-table-column label="添加人" align="center" prop="createBy"></el-table-column> -->
             <!-- <el-table-column label="操作" align="center">
               <template slot-scope="scope">
                 <div>
@@ -520,7 +520,7 @@ import ComPagination from '../../../components/common/ComPagination'
 import TabButton from '../../../components/components/TabButton'
 import BaseInfo from './BaseInfo'
 export default {
-  components: { ComDialog, ComTable, ComPagination, TabButton ,BaseInfo},
+  components: { ComDialog, ComTable, ComPagination, TabButton, BaseInfo },
   inject: ['reload'],
   data() {
     return {
@@ -712,7 +712,7 @@ export default {
         {
           label: '操作',
           align: 'center',
-          formatter: (row) => {
+          formatter: row => {
             return (
               <div>
                 <el-button type="text" onClick={this.showEditDialog.bind(this, row)}>
@@ -787,7 +787,7 @@ export default {
     },
     //编辑信息按钮
     editBtn() {
-      this.newCustomerList.forEach((item) => {
+      this.newCustomerList.forEach(item => {
         if (item.type == 'checkbox' && typeof item.value == 'string') {
           item.value = item.value.split('_')
         }
@@ -811,10 +811,10 @@ export default {
       //     return
       //   }
       // }
-      this.newCustomerList.forEach((item) => {
+      this.newCustomerList.forEach(item => {
         if (item.type == 'checkbox') {
           let str = ''
-          item.value.forEach((m) => {
+          item.value.forEach(m => {
             str = str + m + '_'
           })
           item.value = str.substring(1, str.length - 1)
@@ -897,12 +897,12 @@ export default {
     editEnterTag() {
       this.spanIndex = []
       this.spanName = []
-      this.zanCunSpanIndex.forEach((item) => {
+      this.zanCunSpanIndex.forEach(item => {
         this.spanIndex.push(item)
       })
       // let arr = []
       this.selectEnterDialog.config.visible = true
-      this.listName.forEach((item) => {
+      this.listName.forEach(item => {
         this.spanName.push(item)
       })
     },
@@ -910,11 +910,11 @@ export default {
     editPersonTag() {
       this.spanPerIndex = []
       this.tagNamePerName = []
-      this.zanCunPerIndex.forEach((item) => {
+      this.zanCunPerIndex.forEach(item => {
         this.spanPerIndex.push(item)
       })
       this.selectPersonalDialog.config.visible = true
-      this.listPerName.forEach((item) => {
+      this.listPerName.forEach(item => {
         this.tagNamePerName.push(item)
       })
     },
@@ -949,10 +949,10 @@ export default {
       let that = this
       that.listName = []
       that.zanCunSpanIndex = []
-      that.$http.getReCustomerTagList({ customerId: this.customerId }).then((res) => {
+      that.$http.getReCustomerTagList({ customerId: this.customerId }).then(res => {
         let arr = res.data.data
         that.newArrsCustomer = []
-        arr.forEach((item) => {
+        arr.forEach(item => {
           that.newShowArr.push(item.tagList)
         })
         for (var i = 0; i < arr.length; i++) {
@@ -972,10 +972,10 @@ export default {
       let list = []
       that.listPerName = []
       that.zanCunPerIndex = []
-      that.$http.perosonalList({ customerId: that.customerId }).then((res) => {
+      that.$http.perosonalList({ customerId: that.customerId }).then(res => {
         let arr = res.data.data
         that.newPersonlTagList = []
-        arr.forEach((item) => {
+        arr.forEach(item => {
           list.push({ name: item.name, id: item.id })
           if (item.isCheck == true) {
             that.listPerName.push(item.name)
@@ -1017,10 +1017,10 @@ export default {
 
     getEnterList() {
       let that = this
-      that.$http.getEnterTagList().then((res) => {
+      that.$http.getEnterTagList().then(res => {
         let list = res.data.data
         this.tagNameList = res.data.data
-        list.forEach((item) => {
+        list.forEach(item => {
           this.tagList.push(item.tagList)
         })
       })
@@ -1028,7 +1028,7 @@ export default {
     getCustomerDetails() {
       let that = this
       let id = that.customerId
-      that.$http.getCustomerDetail({ id }).then((res) => {
+      that.$http.getCustomerDetail({ id }).then(res => {
         that.customerData = res.data.data
         that.models.id = that.customerId
         that.models.corpFullName = that.customerData.corpFullName
@@ -1127,9 +1127,9 @@ export default {
     },
     //获取用户扩展信息列表
     getCustomerExtendMessage() {
-      this.$http.showNewField({ id: this.customerId }).then((res) => {
+      this.$http.showNewField({ id: this.customerId }).then(res => {
         this.newCustomerList = res.data.data
-        this.newCustomerList.forEach((item) => {
+        this.newCustomerList.forEach(item => {
           if (item.type == 'checkbox') {
             this.$set(item, 'value', '')
             item.value = item.value.split('_')
@@ -1175,7 +1175,7 @@ export default {
         customerId: this.customerId,
         type: 1 // 类型type：0：自动，1：手动
       }
-      this.$http.getCustomerRecordList(params).then((res) => {
+      this.$http.getCustomerRecordList(params).then(res => {
         this.recordData = res.data.data.list
         this.page.total = res.data.data.total
       })
@@ -1239,15 +1239,15 @@ export default {
       })
     },
     getCustomerLifeCyle() {
-      this.$http.getCustomerLifeCyle().then((res) => {
+      this.$http.getCustomerLifeCyle().then(res => {
         let list = res.data.data.list
-        list.forEach((item) => {
+        list.forEach(item => {
           this.customerLifeCycleList.push({ id: item.id, cycleName: item.cycleName })
         })
       })
     },
     getCustomerDetailGroupPage(options) {
-      this.$http.getCustomerDetailGroupPage(options).then((res) => {
+      this.$http.getCustomerDetailGroupPage(options).then(res => {
         this.groupNunber = res.data.data.total
       })
     },
@@ -1277,7 +1277,7 @@ export default {
         customerId: this.customerId,
         type: 0 // 类型type：0：自动，1：手动
       }
-      this.$http.getCustomerRecordList(params).then((res) => {
+      this.$http.getCustomerRecordList(params).then(res => {
         this.dynamicRecord.data = res.data.data.list
         this.dynamicRecord.page.total = res.data.data.total
       })
@@ -1335,7 +1335,7 @@ export default {
         return ''
       }
       let cropUserListStr = ''
-      option.forEach((item) => {
+      option.forEach(item => {
         cropUserListStr = cropUserListStr + ' ' + item.name
       })
       return cropUserListStr

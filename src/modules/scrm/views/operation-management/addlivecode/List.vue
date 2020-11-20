@@ -11,7 +11,12 @@
         <div class="search">
           <el-form inline :model="searchForm" label-width="100px" label-position="right" size="small">
             <el-form-item label="活码名称">
-              <el-input placeholder="请输入活码名称" v-model="searchForm.name" @input="searchLiveCodeList"></el-input>
+              <el-input
+                placeholder="请输入活码名称"
+                v-model="searchForm.name"
+                @input="searchLiveCodeList"
+                clearable
+              ></el-input>
             </el-form-item>
             <!-- <el-form-item label="关联人员">
             <el-input placeholder="请输入关联人员" v-model="searchForm.userName"></el-input>

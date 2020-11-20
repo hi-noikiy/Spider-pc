@@ -11,12 +11,12 @@
           <div class='client'>客户昵称 <span style='font-size:12px;color:#fa9635'>@微信</span><span>（备注名或姓名）</span>
             <i class='el-icon-male' style='color:rgb(66, 126, 186)'></i>
             <!-- <i class='el-icon-female' style='color: rgb(237, 73, 151)'></i> -->
-            <i class='el-icon-edit'></i>
+            <i class='el-icon-edit' @click="visible.visibleEdit=true,visible.vtext='编辑备注名'"></i>
           </div>
           <div class='top_label'>手机：123456789</div>
           <div class='top_label'>所在地：地址</div>
-          <div class='top_label'>标签：暂无<i class='el-icon-edit'></i></div>
-          <div class='top_label'>描述：暂无<i class='el-icon-edit'></i></div>
+          <div class='top_label'>标签：暂无<i class='el-icon-edit' @click="visible.visibleEdit=true,visible.vtext='编辑标签'"></i></div>
+          <div class='top_label'>描述：暂无<i class='el-icon-edit' @click="visible.visibleEdit=true,visible.vtext='编辑描述'"></i></div>
         </div>
       </div>
 
@@ -27,22 +27,23 @@
         </div>
         <div class='inform'>
           <div>所在群</div>
-          <div>暂无<i class='el-icon-edit'></i></div>
+          <div>暂无</div>
         </div>
         <div class='inform'>
           <div>上次联系</div>
-          <div>暂无<i class='el-icon-edit'></i></div>
+          <div>暂无</div>
         </div>
         <div class='inform'>
           <div>联系次数</div>
-          <div>暂无<i class='el-icon-edit'></i></div>
+          <div>暂无</div>
         </div>
         <div class='inform nobr'>
           <div>归属企业成员</div>
-          <div>成员名称-职位-企业<i class='el-icon-edit'></i></div>
+          <el-tooltip content="成员名称-职位-企业" placement="bottom" effect="light">
+            <div style='border:1px solid transparent'>成员名称-职位-企业</div>
+          </el-tooltip>
         </div>
       </div>
-
       <el-tabs type="border-card" class='clicontent' :style="{height:height+'px'}">
         <el-tab-pane label="跟进记录">
           <div>
@@ -119,9 +120,9 @@
               <div class='portrow'><div>手机</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
               <div class='portrow'><div>姓名</div><el-input placeholder="请输入姓名" style='width:180px'></el-input></div>
               <div class='portrow'><div>性别</div>
-                <el-select v-model="type" clearable placeholder="请选择" style='width:180px'>
+                <el-select v-model="type" clearable placeholder="请选择性别" style='width:180px'>
                   <el-option
-                    v-for="item in typeoptions"
+                    v-for="item in gender"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -135,14 +136,14 @@
                   placeholder="选择日期">
                 </el-date-picker>
               </div>
-              <div class='portrow'><div>年龄</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
-              <div class='portrow'><div>QQ</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
-              <div class='portrow'><div>邮箱</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
-              <div class='portrow'><div>爱好</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
+              <div class='portrow'><div>年龄</div><el-input type='number' placeholder="请输入年龄" style='width:180px'></el-input></div>
+              <div class='portrow'><div>QQ</div><el-input placeholder="请输入QQ" style='width:180px'></el-input></div>
+              <div class='portrow'><div>邮箱</div><el-input placeholder="请输入邮箱" style='width:180px'></el-input></div>
+              <div class='portrow'><div>爱好</div><el-input placeholder="请输入爱好" style='width:180px'></el-input></div>
               <div class='portrow'><div>学历</div>
-                <el-select v-model="type" clearable placeholder="请选择" style='width:180px'>
+                <el-select v-model="type" clearable placeholder="请选择学历" style='width:180px'>
                   <el-option
-                    v-for="item in typeoptions"
+                    v-for="item in education"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -150,7 +151,7 @@
                 </el-select>
               </div>
               <div class='portrow'><div>年收入</div>
-                <el-select v-model="type" clearable placeholder="请选择"  style='width:180px'>
+                <el-select v-model="type" clearable placeholder="请选择年收入"  style='width:180px'>
                   <el-option
                     v-for="item in typeoptions"
                     :key="item.value"
@@ -160,7 +161,7 @@
                 </el-select>
               </div>
               <div class='portrow'><div>行业</div>
-                <el-select v-model="type" clearable placeholder="请选择"  style='width:180px'>
+                <el-select v-model="type" clearable placeholder="请选择行业"  style='width:180px'>
                   <el-option
                     v-for="item in typeoptions"
                     :key="item.value"
@@ -169,20 +170,19 @@
                   </el-option>
                 </el-select>
               </div>
-              <div class='portrow'><div>公司</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
+              <div class='portrow'><div>公司</div><el-input placeholder="请输入公司名" style='width:180px'></el-input></div>
               <div class='portrow'><div>区域</div>
                 <el-cascader
-                style='width:180px'
+                  style='width:180px'
                   size="large"
                   :options="addressoptions"
                   v-model="selectedOptions"
                   @change="addressChange">
                 </el-cascader>
-
               </div>
-              <div class='portrow'><div>地址</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
-              <div class='portrow'><div>身份证</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
-              <div class='portrow'><div>微信号</div><el-input placeholder="请输入手机号" style='width:180px'></el-input></div>
+              <div class='portrow'><div>地址</div><el-input placeholder="请输入地址" style='width:180px'></el-input></div>
+              <div class='portrow'><div>身份证</div><el-input placeholder="请输入身份证号" style='width:180px'></el-input></div>
+              <div class='portrow'><div>微信号</div><el-input placeholder="请输入微信号" style='width:180px'></el-input></div>
               <div class='portcol'><div class='picimg'>图片</div>
                 <div class='loadpic'>
                   <div v-if='imagelist.length>0' v-for="(pic,index) in imagelist" :key="index" class='imgbox'>
@@ -198,6 +198,21 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+    <el-dialog
+      :title="visible.vtext"
+      :visible.sync="visible.visibleEdit"
+      :append-to-body="true"
+      :before-close="closeEdit"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      width="400px"
+    >
+      <el-input type="text" ></el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeEdit()">取 消</el-button>
+        <el-button type="primary" @click="successEdit()" :loading="loading">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -210,17 +225,34 @@ export default {
   components: { ComPagination,UploadImagesList},
   data() {
     return {
+      visible:{
+        visibleEdit:false,
+        vtext:''
+      },
+      
       isedit:false,
       type:'',
+      birthday:'',
+      imagelist:[],
+      gender:[
+        {label:'女',value:'1'},
+        {label:'女',value:'1'},
+        {label:'未知',value:'3'}
+      ],
       typeoptions:[
         {label:'未跟进',value:'11'},
         {label:'跟进中',value:'22'},
         {label:'已拒绝',value:'33'},
         {label:'已成交',value:'44'}
       ],
+      education:[
+        {label:'中专',value:'1'},
+        {label:'大专',value:'2'},
+        {label:'本科',value:'3'},
+        {label:'硕士',value:'4'},
+        {label:'博士',value:'5'}
+      ],
       height:'',
-      birthday:'',
-      imagelist:[],
       addressoptions: regionData,
       selectedOptions: [],
       followImages:[]
@@ -251,7 +283,14 @@ export default {
     addressChange(arr) {
       console.log(CodeToText[arr[0]], CodeToText[arr[1]], CodeToText[arr[2]]);
     },
+    // 弹窗确定
+    successEdit(){
 
+    },
+    // 关闭弹窗
+    closeEdit(){
+      this.visible.visibleEdit=false
+    },
     fullTableHeight() {
       const TOP_HEADER_HEIGHT = 50,
         PAGINATION_HEIGHT = 155,
@@ -457,6 +496,7 @@ export default {
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-end;
+      margin-top: 2px;
       .imgbox {
         margin-bottom: 5px;
         position: relative;

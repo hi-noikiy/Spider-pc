@@ -1,129 +1,68 @@
 <template>
-<!-- 选择目标成员树，支持无限层级，勾选部门可选择部门下的所有成员,应用页面"渠道活码"选择多人 -->
-  <!-- 
-  使用说明
-  <department-dialog 
-  :config="dialogVisible" 
-  @closeDialog="dialogVisible.visible = false"
-  :selectedList="memberList"
-  ref="department"
-  @handleConfirm="setMembers"
-  >
-  </department-dialog>
-    1.0  对话框配置 可选
-    dialogVisible: {
-      width: '800px',  对话框宽度，默认600px
-      title: '选择目标成员',  对话框标题，默认选择目标成员
-      visible: false ， 对话框是否开启，默认不开启
-    },
+<!-- 选择目标成员树，支持无限层级，勾选部门可选择部门下的所有成员,应用页面"企业朋友圈"设置对外展示的成员 -->
 
-    2.0  关闭对话框的布尔值 必选
-    dialogVisible.visible = false
-
-    3.0  选中列表
-    memberList:
-    [{
-      id:'123',
-      name:'张三'
-    }]
-
-    4.0 提交函数 必选
-    setMembers(list) {} 返回值为选中的数据数组 
-    返回值
-    [{
-      id: "f8a8112b926446f398f58edbd421c003"  数据id值
-      myId: "0-0-0-0"                         树id值
-      name: "伍"                              成员/部门名称
-      userId: "Wu"                            
-    }]
-    
-  -->
   <div>
-    <el-dialog
-      :title="config.title"
-      :visible="config.visible"
-      :width="config.width"
-      :close-on-click-modal="false"
-      append-to-body
-      :show-close="true"
-      @close="closeDialog"
-    >
-      <div class="tree_title">
-        <div class="title_left">
-          <div class="title_search">
-            <el-input
-              size="small"
-              placeholder="请输入成员/部门名称"
-              v-model="filterText"
-            >
-              <i slot="prefix" class="el-input__icon el-icon-search"></i>
-            </el-input>
-          </div>
-          <div class="add_member">
-            <el-button size="small" plain :disabled='isLoading' @click="dataSync">同步</el-button>
-          </div>
+    <div class="tree_title">
+      <div class="title_left">
+        <div class="title_search">
+          <el-input
+            size="small"
+            placeholder="请输入成员/部门名称"
+            v-model="filterText"
+          >
+            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+          </el-input>
         </div>
-        <div class="title_right">已选择成员({{ selectedMenu.length }})</div>
+        <div class="add_member">
+          <el-button size="small" plain :disabled='isLoading' @click="dataSync">数据同步</el-button>
+        </div>
       </div>
-      <div class="tree_menu" v-loading="isLoading">
-        <!-- 组织架构 -->
-        <div class="menu_left">
-          <div class="left_tree">
-            <el-tree
-              :data="treeMenu"
-              show-checkbox
-              default-expand-all
-              node-key="myId"
-              ref="linkageTree"
-              :props="defaultProps"
-              :highlight-current="true"
-              @check="getCheckedNodes"
-              @check-change="getCurrentNode"
-              :filter-node-method="filterNode"
-            >
-            </el-tree>
-          </div>
+      <div class="title_right">已选择成员({{ selectedMenu.length }})</div>
+    </div>
+    <div class="tree_menu" v-loading="isLoading">
+      <!-- 组织架构 -->
+      <div class="menu_left">
+        <div class="left_tree">
+          <el-tree
+            :data="treeMenu"
+            show-checkbox
+            default-expand-all
+            node-key="myId"
+            ref="linkageTree"
+            :props="defaultProps"
+            :highlight-current="true"
+            @check="getCheckedNodes"
+            @check-change="getCurrentNode"
+            :filter-node-method="filterNode"
+          >
+          </el-tree>
         </div>
-        <!-- 已选择的成员 -->
-        <div class="menu_right">
-          <div class="right_menu">
-            <div class="menu_item" v-for="(item, index) in selectedMenu" :key="index">
-              <span>
-                <i class="item_icon el-icon-s-custom"></i>
-                {{ item.name }}
-              </span>
-              <el-button type="text" icon="el-icon-close" @click="delSetCheckedNodesArrFun(item)"></el-button>
-            </div>
+      </div>
+      <!-- 已选择的成员 -->
+      <div class="menu_right">
+        <div class="right_menu">
+          <div class="menu_item" v-for="(item, index) in selectedMenu" :key="index">
+            <span>
+              <i class="item_icon el-icon-s-custom"></i>
+              {{ item.name }}
+            </span>
+            <el-button type="text" icon="el-icon-close" @click="delSetCheckedNodesArrFun(item)"></el-button>
           </div>
         </div>
       </div>
-      <div class="footer_btns">
-        <el-button type="text" @click="configureWhatToAdd.visible = true" style="margin-right: auto">如何添加新成员?</el-button>
-        <el-button @click="closeDialog" plain>取 消</el-button>
-        <el-button type="primary" @click="handleConfirm">确 定</el-button>
-      </div>
-    </el-dialog>
+    </div>
+    <!-- <div class="foot_btns">
+      <el-button type="text" @click="configureWhatToAdd.visible = true">如何添加新成员?</el-button>
+    </div> -->
     <WhatToAdd :configure="configureWhatToAdd" @closeDialog="closeWhatToAdd" @success="successWhatToAdd"></WhatToAdd>
   </div>
 </template>
 
 <script>
-const dialogConfig = {
-  width: '600px', // 宽度
-  title: '选择目标成员', // 标题
-  visible: false // 对话框开关
-}
 import WhatToAdd from './WhatToAdd'
 export default {
   components: { WhatToAdd },
   props: {
-    // 基本配置信息
-    config: {
-      type: Object,
-      default: () => {
-        return dialogConfig
-      }
-    },
     // 传入的值
     selectedList: {
       type: Array,
@@ -156,26 +95,11 @@ export default {
     this.getDepartmentTree()
   },
   watch: {
-    'config.visible': function (a, b) {
-      if (a) {
-        this.$nextTick(() => {
-          this.setCheckedNodes()
-        })
-      }
-    },
     filterText(val) {
       this.$refs.linkageTree.filter(val);
     }
   },
   methods: {
-    // 关闭弹窗
-    closeDialog() {
-      this.$emit('closeDialog')
-    },
-    // 确认提交
-    handleConfirm() {
-      this.$emit('handleConfirm', this.selectedMenu)
-    },
     // 获取企业组织结构树
     getDepartmentTree(callback) {
       this.$http.getDepartmentTree().then((res) => {
@@ -392,28 +316,6 @@ export default {
     margin-bottom: 20px;
     color: #909399;
   }
-}
-.footer_btns {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 20px;
-}
-// 格式化对话框样式
-::v-deep .el-dialog {
-  border-radius: 6px;
-}
-::v-deep .el-dialog__header {
-  padding: 10px 20px;
-  border-bottom: 1px solid #ebeef5;
-}
-::v-deep .el-dialog__title {
-  font-size: 14px;
-}
-::v-deep .el-dialog__headerbtn {
-  top: 15px;
-}
-::v-deep .el-dialog__body {
-  padding: 20px;
 }
 ::-webkit-scrollbar {
   width: 0;

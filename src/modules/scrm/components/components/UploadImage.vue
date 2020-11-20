@@ -1,6 +1,20 @@
 <template>
   <!-- 
-  上传图片
+  上传图片 参考欢迎语
+  import UploadImage from '../../../components/components/UploadImage'
+  <UploadImage :fileList="imageUrlFileList" @success="UploadImageSuccess"></UploadImage>
+
+  UploadImageSuccess(val) {
+      console.log(val)
+      this.imageUrl = val.length == 0 ? '' : val[0].url
+  },
+  this.imageUrlFileList = [
+    {
+      name: 'image',
+      url: this.imgHost + this.imageUrl
+    }
+  ]
+
   @success(val){}  成功后的回调 val为上传成功返回的数据，
   例如
   [{
@@ -119,8 +133,10 @@ export default {
       this.$message.error(`请上传小于${this.maxLength}张图片`)
     },
     success(res, file, fileList) {
+      console.log('上传成功', res)
       this.showUploadButton(fileList)
       let result = this.formatImageData(fileList)
+      console.log('return', result)
       this.$emit('success', result)
     },
     formatImageData(option) {

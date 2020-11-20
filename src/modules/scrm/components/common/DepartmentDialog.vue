@@ -1,4 +1,5 @@
 <template>
+  <!-- 此组件已舍弃，相应组件已迁移至目录scrm/components/components -->
   <el-dialog
     :title="config.title"
     :visible="config.visible"

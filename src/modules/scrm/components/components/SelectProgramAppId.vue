@@ -1,15 +1,9 @@
 <template>
-  <!-- 选择小程序 参考欢迎语-->  
+  <!-- 选择小程序 -->
   <!-- 
-    <SelectProgramItem ref="SelectProgramItem" :programProps="programIdProps"></SelectProgramItem>
+    <SelectProgramItem ref="SelectProgramItem" :programIdProps="programIdProps"></SelectProgramItem>
 
     programIdProps 需要进行修改的id
-    programIdProps: {
-        id: '',
-        name: '',
-        logo: ''
-      },
-
     获取返回数据  let program = this.$refs.SelectProgramItem.success()
    -->
   <div>
@@ -21,7 +15,7 @@
             v-for="(item, index) in options"
             :key="index"
             :label="item.name"
-            :value="item.id"
+            :value="item.appId"
           >
           </el-option>
         </el-select>
@@ -34,7 +28,7 @@
             <el-card shadow="hover" :body-style="{ padding: '10px' }">
               <div class="programInfoContent">
                 <div class="logo">
-                  <el-avatar size="medium" :src="programInfoOption.logo ? imgHost + programInfoOption.logo : ''"></el-avatar>
+                  <el-avatar size="medium" :src="imgHost + programInfoOption.logo"></el-avatar>
                 </div>
                 <div class="name">{{ programInfoOption.name }}</div>
                 <!-- <div class="deleteBtn">
@@ -152,16 +146,15 @@ export default {
     },
     // 获取小程序列表
     getProgarm(callback) {
-      this.$http.getProgarm().then((res) => {
+      this.$http.getProgarm().then(res => {
         this.options = res.data.data
-        console.log('接口数据',this.options);
         if (callback) {
           callback(this.options)
         }
       })
     },
     getProgarmId() {
-      this.options.forEach((item) => {
+      this.options.forEach(item => {
         if (item.id == this.programId) {
           console.log(item)
           this.programInfoOption = item
@@ -169,16 +162,22 @@ export default {
       })
     },
     uploadImageSuccess(val) {
+      console.log('返回的数据', val)
       this.updateImage = val.length == 0 ? '' : val[0].url
-      this.programForm.logo = val.length == 0 ? '' : val[0].url
+      console.log('什么>', this.updateImage)
+      // this.programForm.logo =
+      // this.options.forEach((item, index) => {
+      //   if (item.id == this.programId) {
+      //     this.options[index].logo = val.length == 0 ? '' : val[0].url
+      //   }
+      // })
     },
     programSubmit() {
-      this.$refs.programForm.validate((valid) => {
+      this.$refs.programForm.validate(valid => {
         if (valid) {
-          console.log('提交的小程序',this.programForm)
+          console.log(this.programForm)
           if (this.type == 'create') {
-            api.addProgarm(this.programForm).then((res) => {
-              console.log('成功返回值',res);
+            api.addProgarm(this.programForm).then(() => {
               this.$message.success('添加小程序成功')
               this.programDialog = false
               this.getProgarm()
@@ -218,7 +217,7 @@ export default {
       this.programDialog = true
       this.type = 'update'
       this.title = '修改小程序'
-      this.options.forEach((item) => {
+      this.options.forEach(item => {
         if (item.id == this.programId) {
           console.log('===>', item)
           this.programForm = item
@@ -243,7 +242,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          api.deleteProgarm({ id: this.programId }).then((res) => {
+          api.deleteProgarm({ id: this.programId }).then(res => {
             this.$message.success('删除小程序成功')
             this.programDialog = false
             this.getProgarm()
@@ -273,17 +272,14 @@ export default {
   },
   watch: {
     programIdProps: {
-      handler: function () {
+      handler: function() {
         let _this = this
         _this.programId = _this.programProps.id
-        if(!_this.programId) {
-          return
-        }
         _this.programInfoOption.name = _this.programProps.name
         _this.programInfoOption.logo = _this.programProps.logo
-        _this.$http.getProgarm().then((res) => {
+        _this.$http.getProgarm().then(res => {
           _this.options = res.data.data
-          _this.options.forEach((item) => {
+          _this.options.forEach(item => {
             if (item.id == _this.programId) {
               _this.programInfoOption = item
             }
@@ -294,14 +290,11 @@ export default {
     }
   },
   created() {
-    if(this.programProps.id){
-      return
-    }
     this.getProgarm()
   },
-  // updated() {
-  //   console.log('组件内接受', this.programIdProps)
-  // }
+  updated() {
+    console.log('组件内接受', this.programIdProps)
+  }
 }
 </script>
 

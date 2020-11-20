@@ -45,5 +45,9 @@ export default {
   //对外信息展示--列表
   getUserExternalPage(params) {
     return fetch.get('api/admin/v1/userExternalAttr/listJoinUser', params)
+  },
+  //对外信息展示--删除
+  deteleExternal(params) {
+    return fetch.json('api/admin/v1/userExternalAttr/delete', params)
   }
 }

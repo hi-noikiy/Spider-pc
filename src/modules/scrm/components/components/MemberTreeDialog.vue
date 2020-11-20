@@ -58,7 +58,7 @@
             </el-input>
           </div>
           <div class="add_member">
-            <el-button @click="synchro" size="small" plain :disabled='isLoading'>同步</el-button>
+            <el-button @click="synchro" size="small" plain :disabled="isLoading">同步</el-button>
           </div>
         </div>
         <div class="title_right">已选择的成员({{ selectedMenu.length }})</div>
@@ -261,13 +261,10 @@ export default {
         let tree = res.data.data
         console.log(res)
         tree.forEach((item) => {
-          // if (item.userList) {
-          //   item.childs.unshift({ id: 1, name: '成员', userList: item.userList, disabled: true })
-          // }
           if (item.userList) {
-            item.userList.forEach((name) => {
-              item.childs.unshift(name)
-            })
+            for (var i = item.userList.length - 1; i >= 0; i--) {
+              item.childs.unshift(item.userList[i])
+            }
           }
         })
         this.treeMenu = JSON.parse(JSON.stringify(tree).replace(/"userList"/g, '"childs"'))

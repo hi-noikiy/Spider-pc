@@ -767,11 +767,11 @@ export default {
         },
         { type: 'index', label: '序号', align: 'center' },
         { prop: 'name', label: '群名称', align: 'center' },
-        {
-          label: '微信群ID',
-          align: 'center',
-          prop: 'chatId'
-        },
+        // {
+        //   label: '微信群ID',
+        //   align: 'center',
+        //   prop: 'chatId'
+        // },
         { prop: 'ownerName', label: '创建人', labelWidth: '200', align: 'center' },
         { prop: 'createTime', label: '创建时间', labelWidth: '200', align: 'center' }
       ],

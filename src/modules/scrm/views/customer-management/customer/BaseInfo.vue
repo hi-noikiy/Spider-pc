@@ -15,10 +15,10 @@
           <span class="name">企业：</span>
           <span class="value">{{ customerList.corpFullName || '- -' }}</span>
         </li>
-        <li>
+        <!-- <li>
           <span class="name">职位：</span>
           <span class="value">{{ customerList.position || '- -' }}</span>
-        </li>
+        </li> -->
         <li>
           <span class="name">电话：</span>
           <span class="value">{{ customerList.mobile || '- -' }}</span>
@@ -73,9 +73,9 @@
             v-model="updateList.corpFullName"
           ></el-input>
         </el-form-item>
-        <el-form-item label="职位" prop="position">
+        <!-- <el-form-item label="职位" prop="position">
           <el-input maxlength="128" show-word-limit placeholder="请输入职务" v-model="updateList.position"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="电话" prop="mobile">
           <el-input
             type="text"
@@ -91,7 +91,7 @@
         </el-form-item>
         <el-form-item :label="item.name" v-for="(item, index) in updateList.extendList" :key="index">
           <div class="text" v-if="item.type == 'text'">
-            <el-input maxlength="40" show-word-limit placeholder="请输入邮箱" v-model="item.value"></el-input>
+            <el-input maxlength="40" show-word-limit :placeholder="`请输入${item.name}`" v-model="item.value"></el-input>
           </div>
           <div class="radio" v-if="item.type == 'radio'">
             <el-radio-group v-model="item.value">
@@ -152,7 +152,6 @@ export default {
     */
     // ---页面渲染函数---
     closeDialogClose() {
-      console.log('qqqqqqqqqqqqqqqqqq')
       this.configure.visible = false
     },
     // 打开弹窗
@@ -172,7 +171,6 @@ export default {
         statusName: this.customerList.statusName,
         description: this.customerList.description
       }
-      console.log('修改的数据', this.updateList)
     },
     success() {
       this.updataCustomerMessage(this.updateList, (res) => {
@@ -201,28 +199,32 @@ export default {
     getCustomerDetail() {
       this.$http.getCustomerDetail({ id: this.customerId }).then((res) => {
         this.customerList = res.data.data
+        if (this.customerList.followUserList) {
+          let remarksArr = []
+          this.customerList.followUserList.forEach((item) => {
+            remarksArr.push(item.remark)
+          })
+          remarksArr = remarksArr.reduce((total, now) => {
+            total.includes(now) ? '' : total.push(now)
+            return total
+          }, [])
+          this.customerList.remarks = remarksArr.join('/')
+        }
         this.customerList.externalProfileList.forEach((item) => {
           if (item.value) {
             let result = /_/g.test(item.value)
             if (result) {
-             item.value = item.value.replace(/_/g, '/')
+              item.value = item.value.replace(/_/g, '/')
             }
           }
         })
-        // console.log('基础信息', this.customerList)
       })
     },
     // 获取拓展信息
     getCustomerExtend() {
       this.$http.showNewField({ id: this.customerId }).then((res) => {
-        // console.log('拓展信息接口数据', res.data.data)
         this.extendList = res.data.data
         this.extendList.forEach((item) => {
-          // console.log('这是获取的信息', item)
-          // if (typeof(item.vlaue) == undefined) {
-          //   console.log('111');
-          //   // this.$set(item, 'value', '')
-          // }
           if (item.type == 'radio' || item.type == 'checkbox') {
             item.optionName = item.optionName.split('_')
           }
@@ -234,7 +236,6 @@ export default {
             }
           }
         })
-        console.log('拓展信息处理过后的数据', this.extendList)
       })
     },
     // 修改基础信息

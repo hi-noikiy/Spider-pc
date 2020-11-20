@@ -2,7 +2,7 @@
   <div class="page">
     <div class="top-btns">
       <el-button type="primary" size="small" @click="createBase">新建字段</el-button>
-      <el-button type="primary" size="small" @click="showBase">设置字段</el-button>
+      <!-- <el-button type="primary" size="small" @click="showBase">设置字段</el-button> -->
     </div>
     <TableList :tableData="tableData" :tableColumn="tableColumn" id="table" :tableHeight="tableHeight"></TableList>
     <Dialog :configure="configure" :height="height" @closeDialog="closeDialog" @success="success">
@@ -15,7 +15,7 @@
           <el-input v-model="ruleForm.name" placeholder="请输入字段名称"></el-input>
         </el-form-item>
         <el-form-item label="输入类型" :required="true">
-          <el-radio-group v-model="ruleForm.type">
+          <el-radio-group v-model="ruleForm.type" :disabled="isUpdate">
             <el-radio label="text">文本</el-radio>
             <el-radio label="radio">单选</el-radio>
             <el-radio label="checkbox">多选</el-radio>
@@ -31,9 +31,9 @@
         >
           <el-input-number v-model="ruleForm.sequence" :step="1" :min="0"></el-input-number>
         </el-form-item>
-        <!-- <el-form-item label="启用" prop="isChecked" :required="true">
-          <el-switch v-model="ruleForm.isChecked" active-color="#294A7B" inactive-color="#EBEEF5"> </el-switch>
-        </el-form-item> -->
+        <el-form-item label="启用" prop="isEnabled" :required="true">
+          <el-switch v-model="ruleForm.isEnabled" active-color="#294A7B" inactive-color="#EBEEF5"> </el-switch>
+        </el-form-item>
       </el-form>
     </Dialog>
     <Dialog
@@ -108,13 +108,21 @@ export default {
           align: 'center'
         },
         {
-          prop: 'isChecked',
-          title: '状态',
+          prop: 'isEnabled',
+          title: '启用状态',
           align: 'center',
           formatter: (row) => {
-            return row.isChecked ? '显示' : '不显示'
+            return row.isEnabled ? '启用' : '不启用'
           }
         },
+        // {
+        //   prop: 'isChecked',
+        //   title: '显示状态',
+        //   align: 'center',
+        //   formatter: (row) => {
+        //     return row.isChecked ? '显示' : '不显示'
+        //   }
+        // },
         {
           prop: '',
           title: '操作',
@@ -137,9 +145,9 @@ export default {
         name: '',
         type: 'text',
         optionName: '',
-        sequence: ''
+        sequence: '',
         // isChecked: true,
-        // isEnabled: true
+        isEnabled: true
       },
       rules: {
         name: [
@@ -148,7 +156,8 @@ export default {
         ]
       },
       tableHeight: 400,
-      defaultList: []
+      defaultList: [],
+      isUpdate: false
     }
   },
   methods: {
@@ -172,6 +181,7 @@ export default {
             this.functions('basicFieldUpdate', this.ruleForm, (res) => {
               this.$message.success('修改字段成功')
               this.configure.visible = false
+              this.isUpdate = false
               this.basicFieldListDefault()
             })
           } else {
@@ -215,11 +225,14 @@ export default {
         name: '',
         type: 'text',
         optionName: '',
-        sequence: ''
+        sequence: '',
+        isEnabled: true
       }
     },
     updateBase(row) {
+      console.log(row)
       this.ruleForm = row
+      this.isUpdate = true
       this.configure.visible = true
     },
     deleteBase(id) {

@@ -20,9 +20,20 @@
           <div class="title">
             <p>选择标签</p>
           </div>
-          <el-form-item label="企业标签:">
-            <el-button icon="el-icon-plus" style="margin-bottom: 10px" size="mini" @click="openEnter">添加</el-button>
+          <el-form-item label="企业标签"> </el-form-item>
+          <el-form-item>
+            <!-- <el-button icon="el-icon-plus" style="margin-bottom: 10px" size="mini" @click="openEnter">添加</el-button> -->
+
             <div class="remark_content">
+              <div class="remark_content_btns">
+                <el-button
+                  icon="el-icon-plus"
+                  @click=";(BehaviorLabelDialogVisible = true), (behaviorLabelType = true)"
+                  plain
+                  size="mini"
+                  circle
+                ></el-button>
+              </div>
               <el-form class="none-form" v-if="tagNameList.length == 0">
                 <el-form-item class="none-tag">
                   暂无创建的企业标签，<el-button type="text" @click="nextRouter">请先前往创建&nbsp;&gt;</el-button>
@@ -33,19 +44,24 @@
                   <div v-for="(item, index) in tagNameList" :key="index" class="remark_tag_box">
                     <div class="remark_tagGroupTitle">{{ item.name }}</div>
                     <div class="remark_tagChange">
-                      <div
-                        @click="changeTags(items.tagId, items.id, items.name)"
-                        v-for="(items, indexs) in item.tagList"
-                        :key="indexs"
-                        :class="['item', spanIndex.indexOf(items.id) > -1 ? 'active' : '']"
-                      >
-                        {{ items.name }}
+                      <div class="remark_tagChange_content">
+                        <div
+                          @click="changeTags(items.tagId, items.id, items.name)"
+                          v-for="(items, indexs) in item.tagList"
+                          :key="indexs"
+                          :class="['item', spanIndex.indexOf(items.id) > -1 ? 'active' : '']"
+                        >
+                          {{ items.name }}
+                        </div>
                       </div>
+                    </div>
+                    <div class="remark_tag_box_btn">
+                      <el-button icon="el-icon-edit" @click="updateBehav(index)" plain size="mini" circle></el-button>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="showmore" v-if="remarkContentBoxHeight > 110">
+              <div class="showmore" v-if="remarkContentBoxHeight > 153">
                 <el-button type="text" @click="remarkContentBoxShowFlag = !remarkContentBoxShowFlag"
                   >{{ remarkContentBoxShowFlag ? '收起' : '展开'
                   }}<i :class="[remarkContentBoxShowFlag ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i
@@ -53,11 +69,15 @@
               </div>
             </div>
           </el-form-item>
-          <el-form-item label="个人标签:">
-            <el-button icon="el-icon-plus" style="margin-bottom: 10px" size="mini" @click="openPersonalTag"
+          <el-form-item label="个人标签"> </el-form-item>
+          <el-form-item>
+            <!-- <el-button icon="el-icon-plus" style="margin-bottom: 10px" size="mini" @click="openPersonalTag"
               >添加</el-button
-            >
+            > -->
             <div class="remark_content">
+              <div class="remark_content_btns">
+                <el-button icon="el-icon-plus" @click="openPersonalTag" plain size="mini" circle></el-button>
+              </div>
               <el-form class="none-form" v-if="personalNameList.length == 0">
                 <el-form-item class="none-tag">
                   暂无创建的个人标签，<el-button type="text">请先创建&nbsp;&gt;</el-button>
@@ -195,6 +215,13 @@
         <el-button type="primary" @click="sumbitEnterpriseAddDialog()">确定</el-button>
       </div>
     </com-dialog>
+    <CompanyLabel
+      :dialogVisible="BehaviorLabelDialogVisible"
+      :fileList="updateBehavList"
+      :type="behaviorLabelType"
+      @closeDialog="BehaviorLabelDialogVisible = false"
+      @reloadData="getEnterTagPage"
+    ></CompanyLabel>
   </div>
 </template>
 
@@ -202,8 +229,9 @@
 import GoBack from '../../../components/components/GoBack.vue'
 import ComDialog from '../../../components/common/ComDialog.vue'
 import ComPagination from '../../../components/common/ComPagination'
+import CompanyLabel from '../../../components/components/CompanyLabel'
 export default {
-  components: { GoBack, ComDialog, ComPagination },
+  components: { GoBack, ComDialog, ComPagination, CompanyLabel },
   data() {
     return {
       addDialog: {
@@ -243,7 +271,7 @@ export default {
           align: 'center',
           minWidth: '120px',
           prop: 'avatar',
-          formatter: row => {
+          formatter: (row) => {
             return <img src={row.avatar} alt="" width="44" height="44" />
           }
         },
@@ -306,10 +334,19 @@ export default {
           title: '新增标签组',
           visible: false
         }
-      }
+      },
+      updateBehavList: {},
+      BehaviorLabelDialogVisible: false,
+      behaviorLabelType: true
     }
   },
   methods: {
+    updateBehav(index) {
+      this.BehaviorLabelDialogVisible = true
+      this.behaviorLabelType = false
+      this.updateBehavList = this.tagNameList[index]
+      console.log(this.tagNameList[index])
+    },
     //删除标签
     deteleEnterpriseRow(index) {
       if (this.enterpriseModel.tagList.length === 1) {
@@ -335,7 +372,7 @@ export default {
         this.$message.warning('请输入标签名')
       } else {
         let newArr = []
-        this.enterpriseModel.tagList.forEach(item => {
+        this.enterpriseModel.tagList.forEach((item) => {
           newArr.push(item.name)
           flags = item.name == ''
         })
@@ -367,7 +404,7 @@ export default {
       if (this.flag) {
         this.$message.warning('请输入标签名')
       }
-      if (this.enterpriseModel.tagList.some(item => !item.name)) {
+      if (this.enterpriseModel.tagList.some((item) => !item.name)) {
         this.$message.warning('请输入标签名')
         return
       }
@@ -403,7 +440,7 @@ export default {
       this.selectIdList = ''
       this.selectNameList = []
       let selectId = []
-      this.customerData.forEach(item => {
+      this.customerData.forEach((item) => {
         this.selectNameList.push(item)
         selectId.push(item.id)
       })
@@ -525,7 +562,7 @@ export default {
         pageSize: this.selectionPage.pageSize,
         name: this.selectionSearchContent
       }
-      this.$http.getCustomerSelectPage(params).then(res => {
+      this.$http.getCustomerSelectPage(params).then((res) => {
         this.selectionData = res.data.data.list
         this.selectionPage.total = res.data.data.total
       })
@@ -535,8 +572,9 @@ export default {
         pageNum: 1,
         pageSize: 999
       }
-      this.$http.getEnterpriseTagPage(params).then(res => {
+      this.$http.getEnterpriseTagPage(params).then((res) => {
         this.tagNameList = res.data.data.list
+        console.log(this.tagNameList)
       })
     },
     getPersonalTagPage() {
@@ -544,7 +582,7 @@ export default {
         pageNum: 1,
         pageSize: 999
       }
-      this.$http.getPersonalTagPage(params).then(res => {
+      this.$http.getPersonalTagPage(params).then((res) => {
         this.personalNameList = res.data.data.list
       })
     }
@@ -599,16 +637,21 @@ export default {
   }
 }
 .remark_content {
-  user-select: none;
-  padding: 20px 68px 20px 20px;
+  padding: 50px 18px 30px 20px;
   width: 800px;
   box-sizing: border-box;
   background-color: #f4f4f4;
   position: relative;
+  .remark_content_btns {
+    position: absolute;
+    top: 4px;
+    right: 18px;
+  }
   .remark_tag_box {
     display: flex;
     // margin-bottom: 10px;
     color: #606266;
+    position: relative;
     .remark_tagGroupTitle {
       width: 72px;
       margin-right: 20px;
@@ -616,27 +659,38 @@ export default {
       line-height: 30px;
     }
     .remark_tagChange {
+      border-bottom: 1px solid #dcdfe6;
+      margin-bottom: 10px;
       flex: 1;
-      display: flex;
-      flex-wrap: wrap;
-      .item {
-        margin-bottom: 10px;
-        cursor: pointer;
-        padding: 5px;
-        background-color: #fff;
-        border-radius: 4px;
-        height: 20px;
-        line-height: 20px;
-        margin-right: 10px;
+      .remark_tagChange_content {
+        display: flex;
+        flex-wrap: wrap;
+        padding-right: 46px;
+        .item {
+          margin-bottom: 10px;
+          cursor: pointer;
+          padding: 5px;
+          background-color: #fff;
+          border-radius: 4px;
+          height: 20px;
+          line-height: 20px;
+          margin-right: 10px;
+        }
       }
+    }
+    .remark_tag_box_btn {
+      position: absolute;
+      top: 0;
+      right: 0;
     }
   }
   .showmore {
     position: absolute;
     right: 10px;
-    bottom: 16px;
+    bottom: 0px;
   }
 }
+
 .query-table {
   margin: 0 10px 20px 0;
 }
@@ -646,7 +700,7 @@ export default {
   color: #fff !important;
 }
 .remark_content_box {
-  height: 110px;
+  height: 153px;
   overflow: hidden;
   &.show {
     height: auto;

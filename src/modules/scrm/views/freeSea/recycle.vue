@@ -17,7 +17,7 @@
         <com-pagination :page="page" @sizeChange="onSizeChange" @pageChange="onPageChange"></com-pagination>
       </div>
     </div>
-    <RecycleRule :visible='showrule' @onClose="onClose"></RecycleRule>
+    <RecycleRule :visible='showrule' :id="updateId" @onClose="onClose"></RecycleRule>
   </div>
 </template>
 
@@ -38,6 +38,7 @@ export default {
     }
     return {
       showrule:false,
+      updateId:'',
       tableData: [], //存储从后台获取到的数组
       column: [
         {
@@ -116,6 +117,7 @@ export default {
   methods: {
     onClose(flag){
       this.showrule=false
+      this.updateId=''
     },
     onSizeChange(val) {
       this.page.pageSize = val

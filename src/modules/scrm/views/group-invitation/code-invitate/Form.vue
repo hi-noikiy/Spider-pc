@@ -11,7 +11,15 @@
               >
                 <el-input placeholder="名称不会展示给用户,用于企业记录渠道名称或使用场景"></el-input>
               </el-form-item>
-              <el-form-item label="使用人员" :required="true"></el-form-item>
+              <el-form-item label="使用人员" :required="true">
+                <div class="user-item" v-if="selectedUsers.length != 0">
+                  <span class="user-item-content" v-for="(item, index) in selectedUsers" :key="index">
+                    <i class="item-icon el-icon-s-custom"></i>
+                    {{ item.name }}
+                  </span>
+                </div>
+                <el-button icon="el-icon-plus" plain size="small" @click="addUsers">添加</el-button>
+              </el-form-item>
               <el-form-item label="好友验证">
                 <div class="verify-switch">
                   <el-switch></el-switch>
@@ -26,6 +34,9 @@
                 </div>
               </el-form-item>
               <el-form-item label="行为标签">
+                <div class="none-tag" v-if="behaviorTagList.length == 0">
+                  暂无创建的行为标签，<el-button type="text" @click="goToCreate">请先前往创建&nbsp;&gt;</el-button>
+                </div>
                 <div class="tag-list-wrapper">
                   <div :class="['tag-list', tagShowMoreFlag ? 'show' : '']">
                     <div class="tag-list-box" ref="behaviorTagList">
@@ -36,6 +47,8 @@
                             class="tag-item"
                             v-for="(obj, idx) in item.tagList"
                             :key="idx"
+                            :class="checkTagActive(obj) ? 'active' : ''"
+                            @click="onTagSelect(obj, item.id)"
                           >
                             {{ obj.name }}
                           </div>
@@ -63,7 +76,7 @@
               <el-form-item label="入群引导语" :required="true">
                 <div class="setting-input-box">
                   <el-input
-                    placeholder="回复内容不能超过1300个字"
+                    placeholder="例：你好！扫码下方二维码进群交流~如有问题，可随时咨询"
                     id="textInput"
                     class="textarea-input"
                     type="textarea"
@@ -86,6 +99,26 @@
                   </div>
                 </div>
               </el-form-item>
+              <el-form-item v-for="(item, index) in selectedColony" :key="index" :label="'群聊' + (index + 1)" :required="true">
+                <div class="group-box">
+                  <div class="group-content">
+                    <div class="g-c-left">
+                      <img class="group-img" src="../../../images/group-icon.png"/>
+                      <div class="group-msg">
+                        <div class="msg-name">{{item.colonyInfo.name}}</div>
+                        <div class="msg-numb">{{item.colonyInfo.quantity}} / 200人</div>
+                      </div>
+                    </div>
+                    <div class="g-c-right">
+                      <!-- <i class="el-icon-edit right-icon"></i> -->
+                      <i class="el-icon-delete right-icon" @click="deleteSelectedColony(index)"></i>
+                    </div>
+                  </div>
+                  <div class="group-qrcode">
+                    <upload-image :multiple="false" tips="上传群二维码" @success="(val) => uploadImageSuccess(val, index)" :fileList="item.colonyInfo.qrCodeList"></upload-image>
+                  </div>
+                </div>
+              </el-form-item>
               <el-form-item label="群聊" :required="true">
                 <el-button size="mini" icon="el-icon-plus" @click="showColonyDialog">选择群聊</el-button>
               </el-form-item>
@@ -105,10 +138,20 @@
                     <p>{{ form.message }}</p>
                   </div>
                 </div>
+                <!-- <div class="p-cont-text" v-if="form.message.length != 0">
+                  <i class="el-icon-user-solid icon-user"></i>
+                  <div>
+                    <img class="img-content" src="#" />
+                  </div>
+                </div> -->
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div class="f-btn-group">
+        <el-button @click="goBack">取消</el-button>
+        <el-button type="primary" @click="submitCodeInvitateForm" :loading="isLoading">保存</el-button>
       </div>
     </div>
     <!-- 选择客户群 -->
@@ -127,14 +170,31 @@
             <!-- <el-table-column label="今日加群人数" align="center" prop="todayIn"></el-table-column> -->
             <!-- <el-table-column label="今日退群人数" align="center" prop="todayOut"></el-table-column> -->
             <el-table-column label="创建时间" align="center" prop="createAtToTime"></el-table-column>
-            <el-table-column label="操作" align="center"></el-table-column>
+            <el-table-column label="操作" align="center">
+              <template slot-scope="scope">
+                <div v-if="scope.row.isSelected">已添加</div>
+                <el-checkbox v-else v-model="scope.row.checked" @change="colonyCheckChange(scope.row)"></el-checkbox>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="common-pagination">
-          <com-pagination :page="colonyDialog.page"></com-pagination>
+          <com-pagination :page="colonyDialog.page" @sizeChange="onSizeChange" @pageChange="onPageChange"></com-pagination>
+        </div>
+        <div class="group-btn">
+          <el-button @click="closeColonyDialog">取 消</el-button>
+          <el-button type="primary" @click="onColonySubmit">确 定</el-button>
         </div>
       </div>
     </com-dialog>
+    <!-- 选择成员 -->
+    <department-dialog
+      :config="departmentDialog.config"
+      @closeDialog="departmentDialog.config.visible = false"
+      :selectedList="selectedUsers"
+      @handleConfirm="handleConfirm"
+    >
+    </department-dialog>
   </div>
 </template>
 
@@ -142,17 +202,28 @@
 import GoBack from '../../../components/components/GoBack'
 import ComDialog from '../../../components/common/ComDialog'
 import ComPagination from '../../../components/common/ComPagination'
+import UploadImage from '../../../components/components/UploadImage'
+import DepartmentDialog from '../../../components/components/MemberTreeLinkageDialog'
 export default {
-  components: { GoBack, ComDialog, ComPagination },
+  components: { GoBack, ComDialog, ComPagination, UploadImage, DepartmentDialog },
   data() {
     return {
       form: {
         message: ''
       },
+      newTime: '', // 当前时刻
+      departmentDialog: { // 选择成员弹窗
+        config: {
+          width: '800px',
+          title: '添加成员',
+          visible: false
+        }
+      },
+      selectedUsers: [], // 已选择的成员
+      selectedTags: [], // 已选的行为标签
       behaviorTagList: [], // 行为标签列表
       behaviorTagBoxHeight: 0, // 行为标签容器高度
       tagShowMoreFlag: false, // 是否显示展开/收起按钮
-      newTime: '', // 当前时刻
       colonyDialog: { // 客户群列表
         config: {
           width: '800px',
@@ -165,7 +236,10 @@ export default {
           pageSize: 15,
           total: 0
         }
-      }
+      },
+      selectedColony: [], // 已选择的群列表
+      selectedRow: {}, // 群聊弹窗中选中的群
+      isLoading: false,
     }
   },
   created() {
@@ -193,6 +267,40 @@ export default {
       const mm = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()
       this.newTime = hh + ':' + mm
     },
+    // 获取选择的成员列表
+    handleConfirm(list) {
+      this.selectedUsers = list
+      console.log('已选择的成员', list)
+      this.departmentDialog.config.visible = false
+    },
+    // 添加成员
+    addUsers() {
+      this.departmentDialog.config.visible = true
+    },
+    // 判断当前标签是否被选中
+    checkTagActive(obj) {
+      let flag = this.selectedTags.some((item) => item.id === obj.id)
+      if (flag) {
+        return true
+      } else {
+        return false
+      }
+    },
+    // 选择行为标签
+    onTagSelect(obj, groupId) {
+      // 当前已经选中则取消选择，否则选中当前项
+      let flag = this.selectedTags.some((item) => item.id === obj.id)
+      if (flag) {
+        this.selectedTags.splice(this.selectedTags.findIndex((item) => item.id === obj.id), 1)
+      } else {
+        let tag = {
+          id: obj.id,
+          name: obj.name,
+          groupId: groupId
+        }
+        this.selectedTags.push(tag)
+      }
+    },
     // 打开群聊弹窗
     showColonyDialog() {
       this.colonyDialog.config.visible = true
@@ -202,12 +310,80 @@ export default {
     closeColonyDialog() {
       this.colonyDialog.config.visible = false
     },
+    // 获取当前选中的群聊
+    onColonySubmit() {
+      this.selectedRow.isSelected = true
+      let obj = {
+        colonyInfo: this.selectedRow,
+        qrCodeList: []
+      }
+      this.selectedColony.push(obj)
+      this.colonyDialog.config.visible = false
+      console.log('已选的群聊', this.selectedColony)
+    },
     // 获取客户群列表
     getColonyList() {
       this.$http.getCustomerColonyPage(this.colonyDialog.page).then(res => {
-        this.colonyDialog.tableData = res.data.data.list
         this.colonyDialog.page.total = res.data.data.total
+        let newList = res.data.data.list
+        newList.forEach(item => {
+          item.checked = false
+          item.isSelected = false
+        })
+        newList.forEach(obj => {
+          let flag = this.selectedColony.some((row) => row.colonyInfo.id === obj.id)
+          if (flag) {
+            obj.isSelected = true
+          }
+        })
+        this.colonyDialog.tableData = newList
+        console.log('已选', this.selectedColony, this.colonyDialog.tableData)
       })
+    },
+    // 选择群聊的项改变
+    colonyCheckChange(row) {
+      console.log('返回值', row.checked)
+      let checked = row.checked
+      let list = [].concat(this.colonyDialog.tableData)
+      list.forEach(item => {
+        item.checked = false
+      })
+      list.forEach(obj => {
+        if (obj.id === row.id) {
+          obj.checked = checked
+        }
+      })
+      this.colonyDialog.tableData = list
+      this.selectedRow = row
+    },
+    // 上传图片成功
+    uploadImageSuccess(val, idx) {
+      console.log('返回数据', val, idx)
+      this.selectedColony[idx].qrCodeList = val
+    },
+    // 删除已选择的群聊
+    deleteSelectedColony(idx) {
+      this.selectedColony.splice(idx, 1)
+    },
+    onSizeChange(val) {
+      this.colonyDialog.page.pageSize = val
+      this.colonyDialog.page.pageNum = 1
+      this.getColonyList()
+    },
+    onPageChange(val) {
+      this.colonyDialog.page.pageNum = val
+      this.getColonyList()
+    },
+    goBack() {
+      this.$router.go(-1)
+    },
+    // 提交自动建群表单
+    submitCodeInvitateForm() {
+
+    },
+    // 跳转到标签管理页
+    goToCreate() {
+      this.$router.push('/main/scrm/tag-library/enterprise/list')
     }
   }
 }
@@ -221,6 +397,7 @@ export default {
   background-color: #ffffff;
   padding: 20px;
   box-sizing: border-box;
+  margin-bottom: 20px;
   .module {
     .title {
       position: relative;
@@ -256,6 +433,7 @@ export default {
             position: relative;
             height: 110px;
             overflow: hidden;
+            padding-right: 68px;
             &.show {
               height: auto;
               overflow: none;
@@ -282,6 +460,10 @@ export default {
                     height: 20px;
                     line-height: 20px;
                     margin: 0 10px 10px 0;
+                  }
+                  .active {
+                    background-color: #294a7b;
+                    color: #ffffff;
                   }
                 }
               }
@@ -313,6 +495,52 @@ export default {
           }
           .tips-content {
             flex: 1;
+          }
+        }
+        .group-box {
+          padding: 20px;
+          background: #fbfbfb;
+          border-radius: 2px;
+          border: 1px solid #eee;
+          font-size: 14px;
+          .group-content {
+            display: flex;
+            line-height: 20px;
+            align-items: center;
+            .g-c-left {
+              display: flex;
+              padding: 10px;
+              width: 250px;
+              background: #ffffff;
+              border: 1px solid #eee;
+              .group-img {
+                width: 40px;
+                height: 40px;
+              }
+              .group-msg {
+                width: 200px;
+                margin-left: 10px;
+                .msg-name {
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                }
+                .msg-numb {
+                  color: #999;
+                }
+              }
+            }
+            .g-c-right {
+              .right-icon {
+                background: #f0f0f0;
+                padding: 4px;
+                cursor: pointer;
+                margin-left: 10px;
+              }
+            }
+          }
+          .group-qrcode {
+            margin-top: 20px;
           }
         }
       }
@@ -386,12 +614,45 @@ export default {
                 top: 8px;
                 left: -15px;
               }
+              .img-content {
+                width: 100px;
+                height: 100px;
+                margin: 20px 0 0 10px;
+              }
             }
           }
         }
       }
     }
   }
+}
+.user-item {
+  width: 500px;
+  display: flex;
+  flex-wrap: wrap;
+  line-height: 14px;
+  border-radius: 3px;
+  .item-icon {
+    color: #294a7b;
+  }
+  span {
+    border: 1px solid #dcdfe6;
+    padding: 5px;
+    cursor: pointer;
+    margin: 8px 8px 7px 0;
+    border-radius: 3px;
+  }
+}
+.colony-dialog {
+  .group-btn {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 20px;
+  }
+}
+.f-btn-group {
+  margin-left: 100px;
+  margin-top: 50px;
 }
 ::v-deep .el-form-item .el-form-item {
   margin-bottom: 22px;

@@ -1,4 +1,5 @@
 <template>
+  <!-- 此组件已舍弃，相应组件已迁移至目录scrm/components/components -->
   <div class="tree-menu">
     <div class="menu-left">
       <div class="title">组织架构</div>

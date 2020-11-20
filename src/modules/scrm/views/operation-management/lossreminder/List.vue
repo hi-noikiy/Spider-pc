@@ -20,9 +20,14 @@
         </div>
         <div class="query-table-box">
           <el-form inline :model="searchForm" label-width="100px" label-position="right" size="small">
-            <el-form-item label=" 客户:">
+            <el-form-item label=" 客户">
               <div>
-                <el-input placeholder="请输入客户" v-model="form.customerName" @input="getLoseMindePage"></el-input>
+                <el-input
+                  placeholder="请输入客户"
+                  v-model="form.customerName"
+                  @input="getLoseMindePage"
+                  clearable
+                ></el-input>
               </div>
               <!-- <div class="quert-table-title" @click="openTagList()">
               <span class="query-table-choose">请选择</span> -->
@@ -43,9 +48,14 @@
               <!-- <i class="el-icon-arrow-down chosse-i"></i>
             </div> -->
             </el-form-item>
-            <el-form-item label="所属成员:">
+            <el-form-item label="所属成员">
               <div>
-                <el-input placeholder="请输入所属成员 " v-model="form.userName" @input="getLoseMindePage"></el-input>
+                <el-input
+                  placeholder="请输入所属成员 "
+                  v-model="form.userName"
+                  @input="getLoseMindePage"
+                  clearable
+                ></el-input>
               </div>
             </el-form-item>
             <!-- <el-form-item>
@@ -84,7 +94,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="删除时间" align="center" prop="deleteTimeToDateTime"> </el-table-column>
+          <el-table-column label="流失时间" align="center" prop="deleteTimeToDateTime"> </el-table-column>
           <!-- <el-table-column prop="conversationId"> </el-table-column> -->
           <el-table-column label="操作" align="center">
             <template slot-scope="scope">

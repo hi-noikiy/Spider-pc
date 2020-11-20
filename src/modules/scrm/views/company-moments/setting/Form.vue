@@ -80,7 +80,8 @@
 </template>
 
 <script>
-import DepartmentTree from '../../../components/common/DepartmentTree'
+// import DepartmentTree from '../../../components/common/DepartmentTree'
+import DepartmentTree from '../../../components/components/MemberTree'
 export default {
   components: { DepartmentTree },
   data() {
@@ -98,8 +99,8 @@ export default {
   },
   created() {
     // this.getMembers()
-    this.getTitleConfig()
-    this.getNameConfig()
+    // this.getTitleConfig()
+    // this.getNameConfig()
   },
   mounted() {
     this.getMembers()
@@ -131,6 +132,7 @@ export default {
       this.$http.setMomentsMembers({ ids: list }).then(() => {
         this.$message.success('保存成功')
         this.syncLoading = false
+        this.getMembers()
       })
     },
     // 切换导航
@@ -144,12 +146,12 @@ export default {
       this.navList[index].isActive = true
       this.activeNav = val
 
-      // if (val === 'guide') {
-      //   this.getTitleConfig()
-      //   this.getNameConfig()
-      // } else if (val === 'member') {
-      //   this.getMembers()
-      // }
+      if (val === 'guide') {
+        this.getTitleConfig()
+        this.getNameConfig()
+      } else if (val === 'member') {
+        this.getMembers()
+      }
     },
     // 动态圈链接标题配置
     getTitleConfig() {
@@ -286,6 +288,7 @@ export default {
 }
 .department-tree {
   max-width: 900px;
+  margin-top: 20px;
 }
 .sample-tips {
   margin: 20px 0;

@@ -20,5 +20,9 @@ export default {
   // 标签建群-删除
   deleteGroupInvitation(params) {
     return fetch.post('api/admin/v1/groupInvitation/delete', params)
-  }
+  },
+  // 标签建群-客户列表
+  getGroupInvitationCustomerPage(params) {
+    return fetch.get('api/admin/v1/groupInvitationCustomer/page', params)
+  },
 }

@@ -8,10 +8,13 @@
         >
       </div>
       <div class="base">
-        <el-tag class="tag" effect="plain" v-for="(item, index) in defaultList" :key="index">
+        <el-tag class="tag" effect="plain" v-for="(item, index) in defaultBaseListl" :key="index">
+          <el-button type="text" icon="el-icon-success" class="get"></el-button>{{ item }}</el-tag
+        >
+        <el-tag class="tag" effect="plain" v-for="(item, index) in defaultList" :key="item+index" v-if="item.isEnabled">
           <el-button
             type="text"
-            :icon="item.isChecked ? 'el-icon-success' : 'el-icon-circle-check'"
+            :icon="item.isChecked ? 'el-icon-success' : 'el-icon-circle-close'"
             class="get"
           ></el-button
           >{{ item.name }}</el-tag
@@ -29,14 +32,21 @@
       @success="successBaseSetting"
     >
       <div class="beforeWords">
-        说明：<el-button type="text" icon="el-icon-success"></el-button>为显示
-        <el-button type="text" icon="el-icon-circle-check"></el-button>为不显示
+        说明：
+        <el-button type="text" disabled icon="el-icon-success"></el-button>系统默认
+        <el-button type="text" icon="el-icon-success"></el-button>为显示
+        <el-button type="text" icon="el-icon-circle-close"></el-button>为不显示
       </div>
       <div class="tagList">
-        <el-tag class="tag" effect="plain" v-for="(item, index) in defaultList" :key="index">
+        <el-tag class="tag" effect="plain" type="info" v-for="(item, index) in defaultBaseListl" :key="index">
+          <el-button type="text" icon="el-icon-success" disabled class="get"></el-button>{{ item }}</el-tag
+        >
+      </div>
+      <div class="tagList">
+        <el-tag class="tag" effect="plain" v-for="(item, index) in defaultList" :key="index" v-if="item.isEnabled">
           <el-button
             type="text"
-            :icon="item.isChecked ? 'el-icon-success' : 'el-icon-circle-check'"
+            :icon="item.isChecked ? 'el-icon-success' : 'el-icon-circle-close'"
             class="get"
             @click="changeBaseInfoIsCheck(index)"
           ></el-button
@@ -59,6 +69,7 @@ export default {
   },
   data() {
     return {
+      defaultBaseListl: ['备注名', '性别', '企业', '电话', '邮箱', '描述'],
       defaultList: [],
       list: [],
       // 基础字段设置
@@ -86,6 +97,7 @@ export default {
         }
       })
       ids = ids.slice(1)
+      console.log(ids)
       this.updateSaveDefault({ ids }, (res) => {
         this.configureBaseSetting.visible = false
         this.getlistDefault()
@@ -112,10 +124,13 @@ export default {
     },
     // ---获取数据---
     getlistDefault() {
+      console.log('aa')
       this.$http.getlistDefault().then((res) => {
+        console.log('bb')
         console.log('数据', res.data.data)
         this.defaultList = res.data.data.defaultList
         this.list = res.data.data.list
+        console.log('cc');
       })
     },
     //停用按钮
@@ -197,11 +212,14 @@ export default {
   }
   .tag {
     margin-right: 10px;
+    margin-bottom: 10px;
     display: flex;
   }
   .base {
     padding: 10px 0;
     display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
   }
   .get,
   .del {
@@ -217,11 +235,13 @@ export default {
   }
 }
 .tagList {
-  padding: 10px 0;
+  padding-top: 10px;
   display: flex;
+  flex-wrap: wrap;
   .tag {
     margin-right: 10px;
     display: flex;
+    margin-bottom: 10px;
   }
   .get {
     padding: 0;

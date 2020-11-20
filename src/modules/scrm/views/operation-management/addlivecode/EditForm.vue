@@ -33,8 +33,10 @@
                 {{ item.name }}
               </span>
             </div>
-            <el-button icon="el-icon-plus" @click="addPeople" plain size="small">添加</el-button>
-            <div class="add-title">(即该活码可以添加的人员，多人随机分配)</div>
+            <div class="add-title">
+              <el-button icon="el-icon-plus" @click="addPeople" plain size="small">添加</el-button>
+              (即该活码可以添加的人员，多人随机分配)
+            </div>
           </el-form-item>
           <el-form-item label="行为标签">
             <div class="remark_content">

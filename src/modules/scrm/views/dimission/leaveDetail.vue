@@ -41,7 +41,7 @@
               </el-form-item>
               <el-form-item label="分配时间">
                 <el-date-picker
-                @change="getDatePicker"
+                  @change="getDatePicker"
                   v-model="begend"
                   format="yyyy-MM-dd"
                   type="datetimerange"

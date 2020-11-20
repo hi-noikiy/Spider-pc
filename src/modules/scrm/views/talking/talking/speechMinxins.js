@@ -148,7 +148,7 @@ export default {
         {
           label: '创建时间',
           minWidth: '100px',
-          align: 'left',
+          align: 'center',
           prop: 'createTime',
           formatter: row => {
             return row.createTime.slice(0, row.createTime.length - 3)
@@ -412,7 +412,7 @@ export default {
           {
             label: '创建时间',
             minWidth: '100px',
-            align: 'left',
+            align: 'center',
             prop: 'createTime',
             formatter: row => {
               return row.createTime.slice(0, row.createTime.length - 3)
